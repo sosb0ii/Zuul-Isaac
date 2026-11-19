@@ -12,7 +12,7 @@ public class Item
     private String name;
     private String description;
     private double weight;
-    private String location;
+    // private String location;
     
     /**
      * Create the item by specifying its name, description, and weight

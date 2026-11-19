@@ -1,5 +1,4 @@
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.*;
 /**
  * A character in the Zuul game. Can represent a player or an NPC.
  *
@@ -104,7 +103,11 @@ public class Player
         this.capacity = capacity;
     }
 
-    //handle room update                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        */
+    /**
+     * Move the player to a new room.
+     * @param newRoom the room to move to
+     * @return true if the move is successful
+     */
     private boolean goRoom(Room newRoom){
         if (newRoom == currentRoom){ //ensure it is a different room
             return false;
@@ -165,21 +168,99 @@ public class Player
      * @return true if successful
      */
     public boolean pickUp(String itemName){
-        if (!inventory.contains(itemName)){
+        if (!currentRoom.hasItem(itemName)){ //if item not in room (redundant)
             return false; // 
         }
-        double itemWeight = inventory.getItemWeight(itemName);
-        if (itemWeight < 0){ //true when item not in inventory
+        double itemWeight = currentRoom.getItemWeight(itemName);
+        if (itemWeight < 0){ //if item not in room
             return false;
-        } else if (itemWeight > this.canCarry()){ //too heavy
+        } else if (itemWeight > this.canCarry()){ //if item too heavy
             return false; 
         } else { //exists, not too heavy
-            Item item = // MAJOR CODING MISTAKE, SHOULD BE CHECKIGN ROOM NOT INVENTORY
-        
-        // verify that an item of that name exists in the current room
-        // verify that the item is light enough for you to carry
-        // remove the item from the room
-        // add the item to your inventory
+            Item item = currentRoom.retrieveItem(itemName);
+            inventory.acquire(item);
+            return true;
+        }
+    }
+
+    /**
+     * Try to put an item down in the current room
+     * @param itemName the name of the item to put down
+     * @return true if successful
+     */
+    public boolean setDown(String itemName){
+        if (!inventory.contains(itemName)){ //if item not in inventory
+            return false;
+        } else {
+            Item item = inventory.retrieve(itemName);
+            if (!currentRoom.willAcquireItem(item)){ //current room will not acquire item, oh no!
+                inventory.acquire(item); //pick the item back up so you don't lose it
+                return false;
+            } else { // room will take the item
+                return currentRoom.acquireItem(item);
+            }
+        }
+    }
+
+    // /**
+    //  * Remove an item from the player, and return it.
+    //  * 
+    //  * Might Remove
+    //  * 
+    //  * If there is more than one item with the specified name,
+    //  * it will just remove/return one of them, and no particular order is guaranteed.
+    //  * If there is no item with the specified name, return null.
+    //  * @param itemName the name of the item to retrieve
+    //  * @return an item with the specified name
+    //  */
+    // public Item retrieveItem(String itemName){
+    //     return inventory.retrieve(itemName);    
+    // }
+    
+    /**
+     * Add an item to the player's inventory.
+     * Primarily for setup purposes
+     * @param item the item to add to the player's inventory
+     * @return true if the item was successfully acquired
+     */
+    public boolean acquireItem(Item item){
+        if (!willAcquireItem(item)){ //item will not be acquired for some reason
+            return false;
+        }
+        return inventory.acquire(item);
+    }
+
+    /**
+     * Whether a player can pick up a specified item
+     * @param item the item to check pickupability
+     * @return true if the player can pick up the item
+     */
+    public boolean willAcquireItem(Item item){
+        return (item.getWeight() <= canCarry() && inventory.willAcquire(item));
+    }
+
+    /**
+     * The items in the players inventory
+     * @return a display string of item info
+     */
+    public String getInventoryList(){
+        return name+"'s Inventory:\n"+inventory.list();
     }
     
+    public boolean givePlayerItem(String playerName, String itemName){
+        if (!inventory.contains(itemName)){ // player does not have the item to give
+            return false;
+        }
+        if (!currentRoom.hasPlayer(playerName)){ //target player not in room!
+            return false;
+        }
+        Player targetPlayer = currentRoom.getPlayer(playerName);
+        Item item = inventory.retrieve(itemName); //NOTE: item now out of inventory
+        if (!targetPlayer.willAcquireItem(item)){ //target cannot take item
+            this.inventory.acquire(item); //put it back in Player's own inventory
+            return false;
+        } else { //target can take item, so go ahead!
+            return targetPlayer.acquireItem(item); //have every reason to expect a success here
+        }
+    }
 }

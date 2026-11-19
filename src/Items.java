@@ -26,6 +26,14 @@ public class Items
     public boolean isEmpty(){
         return contents.isEmpty();
     }
+
+    /**
+     * How many items are in the collection
+     * @return the number of items in the collection
+     */
+    public int size(){
+        return contents.size();
+    }
     
     /**
      * Whether the collection contains an item with the specified name
@@ -70,14 +78,31 @@ public class Items
      * @returns true if the item was successfully acquired
      */
     public boolean acquire(Item item){
+        if (!willAcquire(item)){ //will not acquire item
+            return false;
+        } else { //will acquire!
+            return contents.add(item);
+        }
+    }
+
+    /**
+     * Checks if an item can be added, without adding it
+     * 
+     * If an item in the collection already has that name
+     * but a different weight or description, this returns false.
+     * @param item the item to add to the collection
+     * @returns true if the item can be acquired
+     */
+    public boolean willAcquire(Item item){
         for (Item already:contents){
             if(already.getName().equals(item.getName()) && !already.matches(item)){
                 return false;
             }
         }
-        return contents.add(item);
+        return true;
     }
-    
+
+
     /**
      * List items contained herein.
      * Include the number of each item,
@@ -138,5 +163,19 @@ public class Items
             totalWeight += item.getWeight();
         }
         return totalWeight;
+    }
+
+    /**
+     * Check if the collection contains a matching item
+     * @param item the item to check
+     * @return true if a matching item is in the collection
+     */
+    public boolean containsMatching(Item item){
+        for (Item already:contents){
+            if(already.matches(item)){
+                return true;
+            }
+        }
+        return false;
     }
 }

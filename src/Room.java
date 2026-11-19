@@ -1,8 +1,4 @@
-import java.util.Set;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * Class Room - a room in an adventure game.
@@ -24,13 +20,13 @@ public class Room
     private String description;
     private HashMap<String, Room> exits;        // stores exits of this room.
     private Items items;        // the items in this room.
-    private ArrayList<Player> players;
+    private HashSet<Player> players;
     
     //initialize fields. Call in every constructor.
     private void initFields(){
         exits = new HashMap<>();
         items = new Items();
-        players = new ArrayList<>();
+        players = new HashSet<>();
     }
 
     /**
@@ -78,6 +74,31 @@ public class Room
         return items.contains(itemName);
     }
     
+    /**
+     * Whether a room contains the player with the specified name
+     * @param playerName the name of the player to search
+     * @return true if a player with that name is in the room
+     */
+    public boolean hasPlayer(String playerName){
+        for (Player player: players){
+            if (player.getName().equals(playerName)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public Player getPlayer(String playerName){
+        for (Player player: players){
+            if (player.getName().equals(playerName)){
+                return player;
+            }
+        }
+        return null;
+    }
+
+
+
     /**
      * What items are in the room
      * @return a string of items contained in the room, and their information.
@@ -178,6 +199,15 @@ public class Room
     public boolean acquireItem(Item item){
         return items.acquire(item);
     }
+
+    /**
+     * Whether an item can be acquired by the room
+     * @param item the item to check acquisability
+     * @return true if the item can be acquired
+     */
+    public boolean willAcquireItem(Item item){
+        return items.willAcquire(item);
+    }
     
     /**
      * Remove a player from the room.
@@ -204,6 +234,26 @@ public class Room
             }
         }
         return players.add(newPlayer); //ArrayList.add()
+    }
+
+    /**
+     * Get the weight of a specified item
+     * 
+     */
+    public double getItemWeight(String itemName){
+        return items.getItemWeight(itemName);
+    }
+
+    /**
+     * How many items are in the room
+     * @return the number of items in the room
+     */
+    public int getNumItems(){
+        return items.size();
+    }
+
+    public boolean hasMatchingItem(Item item){
+        return items.containsMatching(item);
     }
 }
 
