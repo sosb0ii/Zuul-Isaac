@@ -7,14 +7,15 @@ import org.junit.jupiter.api.BeforeEach;
  * Challenge
  */
 public class Challenge {
-    public static Player Chii = new Player("Chii",12);
+    public static World cheeseWorld = new World();
+    public static Room plasmaLab = new Room("Plasma_Lab","So much fun!", cheeseWorld);
+    public static Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
+    public static Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
+    public static Player Chii = new Player("Chii",12, mensRoom);
     public static Item laptop = new Item("laptop","sleek mac",8);
     public static Item mouse1 = new Item("mouse","goes squeak",2);
     public static Item mouse2 = new Item("mouse","goes click",1);
     public static Item mouse3 = new Item("mouse","goes squeak", 2);
-    public static Room plasmaLab = new Room("Plasma_Lab","So much fun!");
-    public static Room vanderHall = new Room("Vanderwerf_Hallway","straight and long");
-    public static Room mensRoom = new Room("Mens_Room","For taking care of business");
 
     public Challenge(){
         Chii.spawn(mensRoom);
