@@ -20,7 +20,7 @@ public class Player
      * @param spawnpoint the room where the player starts
      */
     public Player (String name, Room spawnpoint){
-        this.name = name;
+        this.name = name; //must happen before spawn
         this.currentRoom = spawnpoint;
         roomHistory = new ArrayList<>();
         inventory = new Items();
@@ -34,7 +34,7 @@ public class Player
      * @param name the name of the player
      */
     public Player (String name, double capacity, Room spawnpoint){
-        this.name = name;
+        this.name = name; //must happen before spawn
         this.currentRoom = spawnpoint;
         roomHistory = new ArrayList<>();
         inventory = new Items();

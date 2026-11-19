@@ -21,11 +21,44 @@ public class Item
      * name = "moneybag"
      * description = "a pouch of coins"
      * weight = 3.2
+     * 
+     * @param name the name of the item
+     * @param description the description of the item
+     * @param weight the weight of the item
+     * @param owner the player to have the item
      */
-    public Item (String name, String description, double weight){
+    public Item (String name, String description, double weight, Player owner){
         this.name = name;
         this.description = description;
         this.weight = weight;
+        boolean added = owner.acquireItem(this);
+        if (!added){ //if the item was not added to the player, it is not created
+            System.out.println("Unable to add "+name+"to player: "+owner.getName());
+        }
+
+    }
+    /**
+     * Create the item by specifying its name, description, and weight
+     * 
+     * For example,
+     * name = "moneybag"
+     * description = "a pouch of coins"
+     * weight = 3.2
+     * 
+     * @param name the name of the item
+     * @param description the description of the item
+     * @param weight the weight of the item
+     * @param location the room to have the item
+     */
+    public Item (String name, String description, double weight, Room location){
+        this.name = name;
+        this.description = description;
+        this.weight = weight;
+        boolean added = location.acquireItem(this);
+        if (!added){ //if the item was not added to the player, it is not created
+            System.out.println("Unable to add "+name+"to room: "+location.getName());
+        }
+
     }
 
     //mainly for quick testing
@@ -35,14 +68,42 @@ public class Item
      * 
      * For example,
      * name = "moneybag"
-     * description = "a pouch of coins"
-     * weight = 3.2
+     * description = ""
+     * weight = 0
+     * 
+     * @param name the name of the item
+     * @param owner the player to have the item
      */
-
-    public Item (String name){
+    public Item (String name, Player owner){
         this.name = name;
         this.description = "";
         this.weight = 0;
+        boolean added = owner.acquireItem(this);
+        if (!added){
+            System.out.println("Unable to add "+name+" to player: "+owner.getName());
+        }
+    }
+    //mainly for quick testing
+    /**
+     * Create the item by specifying only its name.
+     * Description is "" and weight is 0 by default
+     * 
+     * For example,
+     * name = "moneybag"
+     * description = ""
+     * weight = 0
+     * 
+     * @param name the name of the item
+     * @param location the room to have the item
+     */
+    public Item (String name, Room location){
+        this.name = name;
+        this.description = "";
+        this.weight = 0;
+        boolean added = location.acquireItem(this);
+        if (!added){
+            System.out.println("Unable to add "+name+" to room: "+location.getName());
+        }
     }
     
     /**
