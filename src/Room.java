@@ -20,13 +20,13 @@ public class Room
     private String description;
     private HashMap<String, Room> exits;        // stores exits of this room.
     private Items items;        // the items in this room.
-    private HashSet<Player> players;
+    private ArrayList<Player> players; // uniqueness will be enforced by World
     
     //initialize fields. Call in every constructor.
     private void initFields(){
         exits = new HashMap<>();
         items = new Items();
-        players = new HashSet<>();
+        players = new ArrayList<>();
     }
 
     /**
