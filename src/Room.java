@@ -21,34 +21,38 @@ public class Room
     private HashMap<String, Room> exits;        // stores exits of this room.
     private Items items;        // the items in this room.
     private ArrayList<Player> players; // uniqueness will be enforced by World
+    private final World theWorld; //must be specified on creation
     
-    //initialize fields. Call in every constructor.
-    private void initFields(){
-        exits = new HashMap<>();
-        items = new Items();
-        players = new ArrayList<>();
-    }
-
     /**
-     * Create a room named "name."
+     * Create a room named "name" in `World`.
      * Description remains empty until specified.
      * @param name the room's name
+     * @param world the world this room is in
      */
-    public Room(String name){
+    public Room(String name, World world){
         this.name = name;
         this.description = "";
-        initFields();
+        this.exits = new HashMap<>();
+        this.items = new Items();
+        this.players = new ArrayList<>();
+        this.theWorld = world;
+        theWorld.addRoom(this); //add the room to the world
     }
     
     /**
-     * Create a room named "name" with description "description".
+     * Create a room named "name" in `World` with description "description".
      * @param name the room's name
      * @param description the room's description
+     * @param world the world this room is in
      */
-    public Room(String name, String description){
+    public Room(String name, String description, World world){
         this.name = name;
         this.description = description;
-        initFields();
+        this.exits = new HashMap<>();
+        this.items = new Items();
+        this.players = new ArrayList<>();
+        this.theWorld = world;
+        theWorld.addRoom(this); //add the room to the world
     }
     
     /**
@@ -236,6 +240,12 @@ public class Room
         return players.add(newPlayer); //ArrayList.add()
     }
 
+    public boolean spawnPlayer(Player newPlayer){
+        boolean registered = theWorld.registerPlayer(newPlayer); //should always be true due to renaming tactic
+        boolean spawned = addPlayer(newPlayer);
+        return (registered && spawned);
+    }
+
     /**
      * Get the weight of a specified item
      * 
@@ -255,5 +265,25 @@ public class Room
     public boolean hasMatchingItem(Item item){
         return items.containsMatching(item);
     }
+
+    /**
+     * To avoid rooms having the same name, we add a number to repeat names
+     * 
+     * E.g., adding a "bathroom" twice would make the second one "bathroom(1)"
+     */
+    public void rename(){
+        String nameStr;
+        int count;
+        if(name.endsWith(")")){ // we've done this before
+            nameStr = name.substring(0,name.lastIndexOf("("));
+            count = Integer.parseInt(name.substring(name.lastIndexOf("(")+1,name.lastIndexOf(")")));
+        } else { //first time renaming
+            nameStr = name;
+            count = 0;
+        }
+        name = nameStr+"("+(count+1)+")";
+}
+
+
 }
 
