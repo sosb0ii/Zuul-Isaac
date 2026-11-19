@@ -1,0 +1,100 @@
+
+/**
+ * A simple class of the items in the game.
+ * An item can only be in one place at a certain time,
+ * but more than one item can have the same name
+ *
+ * @author (your name)
+ * @version (a version number or a date)
+ */
+public class Item
+{
+    private String name;
+    private String description;
+    private double weight;
+    private String location;
+    
+    /**
+     * Create the item by specifying its name, description, and weight
+     * 
+     * For example,
+     * name = "moneybag"
+     * description = "a pouch of coins"
+     * weight = 3.2
+     */
+    public Item (String name, String description, double weight){
+        this.name = name;
+        this.description = description;
+        this.weight = weight;
+    }
+
+    //mainly for quick testing
+    /**
+     * Create the item by specifying only its name.
+     * Description is "" and weight is 0 by default
+     * 
+     * For example,
+     * name = "moneybag"
+     * description = "a pouch of coins"
+     * weight = 3.2
+     */
+
+    public Item (String name){
+        this.name = name;
+        this.description = "";
+        this.weight = 0;
+    }
+    
+    /**
+     * Return the item's info
+     * 
+     * For example,
+     * moneybag (3.2 lbs): A pouch of coins
+     */
+    public String getInfoString(){
+        return name+" ("+weight+" lbs): " +description.toUpperCase();
+    }
+    
+    /**
+     * Return the name of the item
+     */
+    public String getName(){
+        return name;
+    }
+    
+    /**
+     * Return the description of the item
+     */
+    public String getDescription(){
+        return description;
+    }
+    
+    /**
+     * Return the weight of the item
+     */
+    public double getWeight(){
+        return weight;
+    }
+    
+    /**
+     * Whether another item matches
+     * 
+     * (items are not all unique, but they are not interchangeable)
+     * @param other the item to comapare to
+     * @returns true if the name, description, and weight are the same
+     * @returns false if the name or description or weight differ
+     */
+    public boolean matches(Item other){
+        if (!name.equals(other.getName())){ //diff name
+            return false;
+        } else if (!description.equals(other.getDescription())){ //diff description
+            return false;
+        } else if (weight != other.getWeight()){// diff weight
+            return false;
+        } else{ // all same
+            return true;
+        }
+    }
+    
+    
+}
