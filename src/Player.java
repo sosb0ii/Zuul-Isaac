@@ -182,10 +182,11 @@ public class Player
                 currentRoom.acquireItem(item); //put the item back in the room
                 return false;
             } //otherwise the item CAN be acquired!
-            if (!inventory.acquire(item)){
+            boolean acquired = inventory.acquire(item);
+            if (!acquired){
                 throw new RuntimeException("Accidentally deleted an item! Removed from room for pickup but not successfully acquired by player. Something needs fixed.");
             }
-            return true;
+            return acquired;
         }
     }
 
