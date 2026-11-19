@@ -178,7 +178,13 @@ public class Player
             return false; 
         } else { //exists, not too heavy
             Item item = currentRoom.retrieveItem(itemName);
-            inventory.acquire(item);
+            if (!inventory.willAcquire(item)){
+                currentRoom.acquireItem(item); //put the item back in the room
+                return false;
+            } //otherwise the item CAN be acquired!
+            if (!inventory.acquire(item)){
+                throw new RuntimeException("Accidentally deleted an item! Removed from room for pickup but not successfully acquired by player. Something needs fixed.");
+            }
             return true;
         }
     }
