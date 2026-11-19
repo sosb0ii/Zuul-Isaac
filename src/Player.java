@@ -17,25 +17,30 @@ public class Player
     /**
      * Create a player with a certain name.
      * @param name the name of the player
+     * @param spawnpoint the room where the player starts
      */
-    public Player (String name){
+    public Player (String name, Room spawnpoint){
         this.name = name;
+        this.currentRoom = spawnpoint;
         roomHistory = new ArrayList<>();
         inventory = new Items();
         likeness = "";
         capacity = (double) 30;
+        currentRoom.spawnPlayer(this); //spawn the player in the room
     }
 
     /**
      * Create a player with a certain name.
      * @param name the name of the player
      */
-    public Player (String name, double capacity){
+    public Player (String name, double capacity, Room spawnpoint){
         this.name = name;
+        this.currentRoom = spawnpoint;
         roomHistory = new ArrayList<>();
         inventory = new Items();
         likeness = "";
         this.capacity = capacity;
+        currentRoom.spawnPlayer(this); //spawn the player in the room
     }
 
     
@@ -46,7 +51,25 @@ public class Player
     public String getName(){
         return name;
     }
-    
+
+    /**
+     * To avoid players having the same name, we add a number to repeat names
+     * 
+     * E.g., adding a "Niklas" twice would make the second one "Niklas(1)"
+     */
+    public void rename(){
+        String nameStr;
+        int count;
+        if(name.endsWith(")")){ // we've done this before
+            nameStr = name.substring(0,name.lastIndexOf("("));
+            count = Integer.parseInt(name.substring(name.lastIndexOf("(")+1,name.lastIndexOf(")")));
+        } else { //first time renaming
+            nameStr = name;
+            count = 0;
+        }
+        name = nameStr+"("+(count+1)+")";
+}
+
     /**
      * Get the room the player is currently in
      * @return the current room of the player
