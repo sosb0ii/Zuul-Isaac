@@ -12,10 +12,10 @@ public class Challenge {
     public static Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
     public static Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
     public static Player Chii = new Player("Chii",12, mensRoom);
-    public static Item laptop = new Item("laptop","sleek mac",8);
-    public static Item mouse1 = new Item("mouse","goes squeak",2);
-    public static Item mouse2 = new Item("mouse","goes click",1);
-    public static Item mouse3 = new Item("mouse","goes squeak", 2);
+    public static Item laptop = new Item("laptop","sleek mac",8,Chii);
+    public static Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
+    public static Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
+    public static Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
 
     public Challenge(){
         Chii.spawn(mensRoom);
