@@ -268,19 +268,16 @@ public class Player
      * @return true if successful
      */
     public boolean givePlayerItem(String playerName, String itemName){
-        if (!inventory.contains(itemName)){ // player does not have the item to give
-            return false;
-        }
-        if (!currentRoom.hasPlayer(playerName)){ //target player not in room!
-            return false;
-        }
         Player targetPlayer = currentRoom.getPlayer(playerName);
-        Item item = inventory.retrieve(itemName); //NOTE: item now out of inventory
-        if (!targetPlayer.willAcquireItem(item)){ //target cannot take item
-            this.inventory.acquire(item); //put it back in Player's own inventory
+        Item item = retrieveItem(itemName);
+        if (targetPlayer == null || item == null){
             return false;
-        } else { //target can take item, so go ahead!
-            return targetPlayer.acquireItem(item); //have every reason to expect a success here
+        } else if (!targetPlayer.canAcquire(item)){ // too heavy etc.
+            acquireItem(item); // take it back
+            return false;
+        } else {
+            targetPlayer.acquireItem(item);
+            return true;
         }
     }
 }
