@@ -28,7 +28,7 @@ public class CommandWords
      * Check whether a given String is a valid command word. 
      * @return true if it is, false if it isn't.
      */
-    public boolean isCommand(String aString)
+    public static boolean isCommand(String aString)
     {
         for(int i = 0; i < validCommands.length; i++) {
             if(validCommands[i].equals(aString))

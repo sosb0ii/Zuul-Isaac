@@ -87,17 +87,4 @@ public class Challenge {
         assertTrue(Chii.setDown("mouse"));
         assertTrue(didIWin());
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 }

@@ -281,4 +281,20 @@ public class Player
             return true;
         }
     }
+
+    public boolean eat(String foodName){
+        Item food;
+        if (inventory.contains(foodName)){
+            food = inventory.retrieve(foodName);
+            if (food.hasAttribute("edible")){
+                setCapacity(999);
+                return true;
+            } else {
+                inventory.acquire(food); //back in inventory
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
 }

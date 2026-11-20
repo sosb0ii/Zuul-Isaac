@@ -139,6 +139,9 @@ public class Items
         String strOut = "";
         Item item;
         int m;
+        if (contents.isEmpty()){
+            return "\t nothing :(";
+        }
         for (Map.Entry<Item, Integer> eqItem: contents.entrySet()){
             item = eqItem.getKey();
             m = eqItem.getValue();

@@ -1,4 +1,4 @@
-
+import java.util.*;
 /**
  * A simple class of the items in the game.
  * An item can only be in one place at a certain time,
@@ -12,6 +12,7 @@ public class Item
     private String name;
     private String description;
     private double weight;
+    private HashSet<String> attributes;
     // private String location;
     
     /**
@@ -164,5 +165,12 @@ public class Item
         }
     }
     
+    public boolean hasAttribute(String attribute){
+        return attributes.contains(attribute);
+    }
+
+    public void setAttribute(String attribute){
+        attributes.add(attribute);
+    }
     
 }

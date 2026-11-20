@@ -23,6 +23,8 @@ public class Game
     private Parser parser;
     private World world;
     private Player activePlayer;
+    private boolean quitGame;
+    private boolean keepPlaying;
     //private Room currentRoom;
     //private ArrayList<Room> roomHistory;
     //private HashMap<Item, Room> itemRegistry; //in case you need to know where a specified item is
@@ -80,13 +82,18 @@ public class Game
         // Enter the main command loop.  Here we repeatedly read commands and
         // execute them until the game is over.
                 
-        boolean finished = false;
-        
-        //initialize the roomHistory, which is "cached" for this play session
-        roomHistory = new ArrayList<>();
-        while (! finished) {
+        boolean success;
+        keepPlaying = true;
+        while (keepPlaying) {
             Command command = parser.getCommand();
-            finished = processCommand(command);
+            success = processCommand(command);
+            if (!success){ // let them know if the command word was valid but didn't work
+                System.out.println("That didn't work. Maybe try something different?");
+            }
+            if(this.isOver()){
+                System.out.println("You have completed the game! Congratulations!");
+                keepPlaying = false;
+            }
         }
         System.out.println("Thank you for playing.  Good bye.");
     }
@@ -107,32 +114,34 @@ public class Game
     /**
      * Given a command, process (that is: execute) the command.
      * @param command The command to be processed.
-     * @return true If the command ends the game, false otherwise.
+     * @return true if the command executed successfully
      */
     private boolean processCommand(Command command) 
     {
-        boolean wantToQuit = false;
 
-        if(command.isUnknown()) {
-            System.out.println("I don't know what you mean...");
-            return false;
+        if(command == null || !command.isValid()) {
+            System.out.println("That didn't make sense. Type 'help' for a list of valid commands.");
+            return true; //avoid printing two error messages
         }
-
         String commandWord = command.getCommandWord();
         if (commandWord.equals("help")) {
             printHelp();
+            return true;
         }
         else if (commandWord.equals("go")) {
-            goRoom(command);
+            return activePlayer.takeExit(command.getArg(0));
         }
         else if (commandWord.equals("quit")) {
-            wantToQuit = quit(command);
+            keepPlaying = false;
+            return true;
         }
         else if (commandWord.equals("clear")) {
             clearDisplay();
-        }
-        // else command not recognised.
-        return wantToQuit;
+            return true;
+        } else if (commandWord.equals("eat")){
+            return activePlayer.eat(command.getArg(0));
+        } // else something went wrong
+        return false;
     }
 
     // implementations of user commands:
