@@ -40,7 +40,7 @@ public class Items
      * @param itemName the name of the item to search for
      * @return true if an item with that name is found in the collection
      */
-    private boolean containsName(String itemName){
+    public boolean contains(String itemName){
         for (Item item: contents.keySet()){
             if (item.getName().equals(itemName)){
                 return true;
@@ -110,7 +110,7 @@ public class Items
     public boolean willAcquire(Item item){
         if (contents.containsKey(item)){ //item already in collection
             return true;
-        } else if (containsName(item.getName())){ //item not in collection, but name taken
+        } else if (contains(item.getName())){ //item not in collection, but name taken
             return false;
         } else { //item not in collection, name not taken
             return true; // can acquire the item by adding it as a new key
