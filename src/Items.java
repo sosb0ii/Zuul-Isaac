@@ -59,26 +59,42 @@ public class Items
     }
 
     /**
+     * How many of the specified item are in the collection
+     * @param itemName the name of the item to search for
+     * @return the number of the named item which are in the collection
+     */
+    public int getCount(String itemName){
+        for (Item item: contents.keySet()){
+            if (item.isNamed(itemName)){
+                return contents.get(item);
+            }
+        }
+        return 0;
+    }
+
+
+
+    /**
      * Remove the item with the specified name from the collection (there should only be one!), and return it.
      * If there is no item with the specified name, return null.
      * @param itemName the name of the item to retrieve
      * @return an item with the specified name
      */
     public Item retrieve(String itemName){ //should GUARANTEE the item removed is the item returned
-        int m = 0; // known multiplicity of the item is currently 0
-        Item itemOut = null;
-        for(Item item: contents.keySet()){
-            if(item.getName().equals(itemName)){ //if you find an item so named,
-                itemOut = item; //prepare item for return (IF the multiplicity is >0)
-                m = contents.get(itemOut); // retrieve the multiplicity (might be 0)
-            }
-        } // multiplicity is integer or 0 (0 is minimum if keyed, or default if not keyed)
-        if (m>0){ // there's something to retrieve
-            contents.put(itemOut, m-1); //decrease the multiplicity by 1
-            return itemOut; //successfully return item 
-        } else{ //m=0, item not in collection or has multiplicity 0
-            return null;
+        int m = getCount(itemName); // known the multiplicity of the item
+        if(m>0){ //there's something to retrieve
+            for(Item item:contents.keySet()){
+                if(item.isNamed(itemName)){
+                    if (contents.get(item) != m){ //something is wrong
+                        throw new IllegalStateException("Item multiplicity is inconsistent, there is a bug");
+                    }
+                    contents.put(item, m-1); //decrease the multiplicity by 1
+                    return item; //successfully return item 
+                }
+            } // the for loop should not finish!
+            throw new IllegalStateException("Positive multiplicity but no item found, there is a bug");
         }
+        return null; //m=0, return nothing
     }
     
     /**
