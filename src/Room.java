@@ -117,7 +117,7 @@ public class Room
      */
     public String listPlayers(){
         if (players.isEmpty()){
-            return null;
+            return "nobody";
         }
         String strOut = players.get(0).getName();
         for(int i=1;i<players.size();i++){
@@ -180,6 +180,25 @@ public class Room
     public Room getExit(String direction) 
     {
         return exits.get(direction);
+    }
+
+    public String listExits(){
+        // return String.join(", ",exits.keySet());
+        if (exits.isEmpty()){
+            return "no exit";
+        }
+        ArrayList<String> exitList = new ArrayList<>(exits.keySet());
+        String strOut = exitList.get(0);
+        for(int i=1;i<exitList.size();i++){
+            if (exitList.size() != 2){ //avoid adding comma for list of 2
+                strOut += ", ";
+            }
+            if (i == exitList.size()-1){
+                strOut += " or ";
+            }
+            strOut += exitList.get(i);
+        }
+        return strOut;
     }
        
     /**

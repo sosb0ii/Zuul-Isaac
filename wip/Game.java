@@ -140,6 +140,13 @@ public class Game
             return true;
         } else if (commandWord.equals("eat")){
             return activePlayer.eat(command.getArg(0));
+        } else if (commandWord.equals("look")){
+            System.out.print("You are in "+activePlayer.getCurrentRoom().getName()); //identify room
+            System.out.println(", "+activePlayer.getCurrentRoom().getDescription());
+            System.out.println("\nYou see "+activePlayer.getCurrentRoom().listPlayers()+" in the room");
+            System.out.println(activePlayer.getCurrentRoom().listItems());
+            System.out.println("\nYou can exit via "+activePlayer.getCurrentRoom().listExits());
+            return true;
         } // else something went wrong
         return false;
     }
