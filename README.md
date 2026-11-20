@@ -1,3 +1,15 @@
+# `Item-keys-Items` branch information
+
+`Item`s are now used exclusively as unique keys in `Items` collections.
+Previously the digital existence of the `Item` object was monitored
+(in essence) to prevent duplication. Now, each `Item` *must* exist in
+an `Items` collection, where it is associated (read: it keys in a HashMap)
+with an integer count. The count is monitered in all `Item` transfers to
+prevent duplication. Count should always be 1 or greater (we remove 0 counts).
+
+Note: Much of the code was written allowing count to be 0, but this shouldn't
+break anything.
+
 # Zuul-Isaac
 
 This is an assignment for CSCI-125.
@@ -30,25 +42,3 @@ This is an assignment for CSCI-125.
 
 These are general ways the project is used, but
 not strictly enforced
-
-# Further ideas
-
- - I'm wondering if Player and Room should be Children of the same class.
-   Half the code is the same! This would be a seperate branch
- - Use a set that tracks multiplicity in `Items`.
- This would make the details of memory location irrelevant.
- Instead `Item.equals()` would be redefined, to alter the underlying behavior of
- logic done on the items.
- This object equivalence would be determined by observing all relevant fields.
- One instance of the object in that equivalence class would be the key to its multiplicity
- in `HashMap<Item> contents`.
- The add(newItem) method would check containsKey(newItem), which would be true if the existing key
- was equivalent in the relevant fields.
- If true, it would increment the multiplicity count.
- If false, it would check that the new item has a unique name (else fail)
- and put a new item with multiplicity 1 to contents.
- The remove(itemName) method would check every key,
- to see if it had that name (share method with that logic in add).
- When that key is found, check the multiplicity.
- If multiplicity >0, (else fail) subtract 1 from multiplicity and return the Item.
- Main idea: `Item`s are only used as keys for the contents of `Items` collections.
