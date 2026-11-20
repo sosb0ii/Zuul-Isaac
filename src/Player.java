@@ -184,32 +184,54 @@ public class Player
     public boolean backtrack(){
         return goRoom(roomHistory.removeLast()); // essentially resets to the previous state 
     }
+
+    /**
+     * Whether the player can add an item to inventory
+     * 
+     * False if it's too heavy or it conflicts with an existing item
+     * @param item the item to check
+     * @return true if the player can acquire the item
+     */
+    public boolean canAcquire(Item item){ //could be item or null
+        return inventory.canAcquire(item) && item.getWeight()<=canCarry();
+    }
     
+    /**
+     * Add an item to the player's inventory.
+     * Primarily for setup purposes
+     * @param item the item to add to the player's inventory
+     * @return true if the item was successfully acquired
+     */
+    public boolean acquireItem(Item item){
+        return inventory.acquire(item); //handles null, bad match, no key
+    }
+
+    /**
+     * Removes one count of the specified item from the player's inventory
+     * and returns the item.
+     * 
+     * Returns null if null string, empty string, invalid key, or 0 count
+     * @param itemName the name of the item to retrieve
+     * @return the item retrieved from the player
+     */
+    public Item retrieveItem(String itemName){
+        return inventory.retrieve(itemName); // handles null, empty name, 0 count, no key.
+    }
+
     /**
      * Attempt to pick up an item from the current room
      * @param itemName the name of the item you want to pick up
      * @return true if successful
      */
     public boolean pickUp(String itemName){
-        if (!currentRoom.hasItem(itemName)){ //if item not in room (redundant)
-            return false; // 
-        }
-        double itemWeight = currentRoom.getItemWeight(itemName);
-        if (itemWeight < 0){ //if item not in room
+        Item item = currentRoom.retrieveItem(itemName); // is null or item
+        if (item == null){
+            return false; //nothing ever retrieved so it's fine
+        } else if (!canAcquire(item)){ //too heavy or bad match
+            currentRoom.acquireItem(item); //drop it back into the room
             return false;
-        } else if (itemWeight > this.canCarry()){ //if item too heavy
-            return false; 
-        } else { //exists, not too heavy
-            Item item = currentRoom.retrieveItem(itemName);
-            if (!inventory.willAcquire(item)){
-                currentRoom.acquireItem(item); //put the item back in the room
-                return false;
-            } //otherwise the item CAN be acquired!
-            boolean acquired = inventory.acquire(item);
-            if (!acquired){
-                throw new RuntimeException("Accidentally deleted an item! Removed from room for pickup but not successfully acquired by player. Something needs fixed.");
-            }
-            return acquired;
+        } else { // light enough, and not a bad match
+            return acquireItem(item); // still safe if no key
         }
     }
 
@@ -219,54 +241,16 @@ public class Player
      * @return true if successful
      */
     public boolean setDown(String itemName){
-        if (!inventory.contains(itemName)){ //if item not in inventory
+        Item item = retrieveItem(itemName); // handles all the bad cases
+        if (item == null){ //no item to speak of
+            return false;
+        } else if (!currentRoom.canAcquire(item)){ //I have the item but does it work for room
+            acquireItem(item); //pick it back up then
             return false;
         } else {
-            Item item = inventory.retrieve(itemName);
-            if (!currentRoom.willAcquireItem(item)){ //current room will not acquire item, oh no!
-                inventory.acquire(item); //pick the item back up so you don't lose it
-                return false;
-            } else { // room will take the item
-                return currentRoom.acquireItem(item);
-            }
+            currentRoom.acquireItem(item); //room gets it
+            return true;
         }
-    }
-
-    // /**
-    //  * Remove an item from the player, and return it.
-    //  * 
-    //  * Might Remove
-    //  * 
-    //  * If there is more than one item with the specified name,
-    //  * it will just remove/return one of them, and no particular order is guaranteed.
-    //  * If there is no item with the specified name, return null.
-    //  * @param itemName the name of the item to retrieve
-    //  * @return an item with the specified name
-    //  */
-    // public Item retrieveItem(String itemName){
-    //     return inventory.retrieve(itemName);    
-    // }
-    
-    /**
-     * Add an item to the player's inventory.
-     * Primarily for setup purposes
-     * @param item the item to add to the player's inventory
-     * @return true if the item was successfully acquired
-     */
-    public boolean acquireItem(Item item){
-        if (!willAcquireItem(item)){ //item will not be acquired for some reason
-            return false;
-        }
-        return inventory.acquire(item);
-    }
-
-    /**
-     * Whether a player can pick up a specified item
-     * @param item the item to check pickupability
-     * @return true if the player can pick up the item
-     */
-    public boolean willAcquireItem(Item item){
-        return (item.getWeight() <= canCarry() && inventory.willAcquire(item));
     }
 
     /**
@@ -277,6 +261,12 @@ public class Player
         return name+"'s Inventory:\n"+inventory.list();
     }
     
+    /**
+     * Give an item to another player
+     * @param playerName the player to give the item to
+     * @param itemName the name of item to give to the other player
+     * @return true if successful
+     */
     public boolean givePlayerItem(String playerName, String itemName){
         if (!inventory.contains(itemName)){ // player does not have the item to give
             return false;
