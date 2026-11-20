@@ -138,14 +138,14 @@ public class Item
     }
     
     /**
-     * Whether another item matches
+     * Whether another item is equal
      * 
-     * (items are not all unique, but they are not interchangeable)
+     * (items are used as keys, so equivalent fields means equivalent items)
      * @param other the item to comapare to
      * @returns true if the name, description, and weight are the same
      * @returns false if the name or description or weight differ
      */
-    public boolean matches(Item other){
+    public boolean equals(Item other){
         if (!name.equals(other.getName())){ //diff name
             return false;
         } else if (!description.equals(other.getDescription())){ //diff description
