@@ -262,8 +262,8 @@ public class Room
         return items.size();
     }
 
-    public boolean hasMatchingItem(Item item){
-        return items.containsMatching(item);
+    public boolean hasItem(Item item){
+        return items.contains(item);
     }
 
     /**
