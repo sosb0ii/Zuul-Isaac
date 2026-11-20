@@ -117,10 +117,17 @@ public class Item
     }
     
     /**
-     * Return the name of the item
+     * @return the name of the item
      */
     public String getName(){
         return name;
+    }
+
+    /**
+     * @return the name of the item
+     */
+    public boolean isNamed(String nameQuery){
+        return name.equals(nameQuery);
     }
     
     /**
