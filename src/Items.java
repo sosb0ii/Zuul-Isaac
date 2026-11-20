@@ -10,13 +10,13 @@ import java.util.*;
  */
 public class Items
 {
-    private HashSet<Item> contents;
+    private HashMap<Item, Integer> contents;
     
     /**
      * Create a collection of Items.
      */
     public Items(){
-        contents = new HashSet<>();
+        contents = new HashMap<>();
     }
     
     /**
@@ -40,8 +40,8 @@ public class Items
      * @param itemName the name of the item to search for
      * @return true if an item with that name is found in the collection
      */
-    public boolean contains(String itemName){
-        for (Item item: contents){
+    private boolean containsName(String itemName){
+        for (Item item: contents.keySet()){
             if (item.getName().equals(itemName)){
                 return true;
             }
@@ -50,23 +50,35 @@ public class Items
     }
 
     /**
-     * Remove an item with the specified name from the collection, and return it.
-     * If there is more than one item with the specified name,
-     * it will just remove/return one of them, and no particular order is guaranteed.
-     * If there is no item with the              name, return null.
+     * Whether the collection contains the item
+     * @param item the item to search for
+     * @return true if that item is found in the collection
+     */
+    public boolean contains(Item item){
+        return contents.containsKey(item);
+    }
+
+    /**
+     * Remove the item with the specified name from the collection (there should only be one!), and return it.
+     * If there is no item with the specified name, return null.
      * @param itemName the name of the item to retrieve
      * @return an item with the specified name
      */
     public Item retrieve(String itemName){ //should GUARANTEE the item removed is the item returned
-        for (Item item: contents){
-            if (item.getName().equals(itemName)){
-                if(!contents.remove(item)){ //removes item. if false somehow, returns null
-                    return null;
-                }
-                return item;
+        int m = 0; // known multiplicity of the item is currently 0
+        Item itemOut = null;
+        for(Item item: contents.keySet()){
+            if(item.getName().equals(itemName)){ //if you find an item so named,
+                itemOut = item; //prepare item for return (IF the multiplicity is >0)
+                m = contents.get(itemOut); // retrieve the multiplicity (might be 0)
             }
+        } // multiplicity is integer or 0 (0 is minimum if keyed, or default if not keyed)
+        if (m>0){ // there's something to retrieve
+            contents.put(itemOut, m-1); //decrease the multiplicity by 1
+            return itemOut; //successfully return item 
+        } else{ //m=0, item not in collection or has multiplicity 0
+            return null;
         }
-        return null;
     }
     
     /**
@@ -81,7 +93,9 @@ public class Items
         if (!willAcquire(item)){ //will not acquire item
             return false;
         } else { //will acquire!
-            return contents.add(item);
+            int m = contents.getOrDefault(item,0);
+            contents.put(item, m+1);
+            return true;
         }
     }
 
@@ -94,46 +108,27 @@ public class Items
      * @returns true if the item can be acquired
      */
     public boolean willAcquire(Item item){
-        for (Item already:contents){
-            if(already.getName().equals(item.getName()) && !already.matches(item)){
-                return false;
-            }
+        if (contents.containsKey(item)){ //item already in collection
+            return true;
+        } else if (containsName(item.getName())){ //item not in collection, but name taken
+            return false;
+        } else { //item not in collection, name not taken
+            return true; // can acquire the item by adding it as a new key
         }
-        return true;
     }
 
 
-    /**
-     * List items contained herein.
-     * Include the number of each item,
-     * the name, the weight, and the description.
-     * @returns a text list describing the items
-     */
-    public String list(){ // a bit of a doozy, innit
+    public String list(){
         String strOut = "";
-        HashSet<Item> clone = (HashSet<Item>) contents.clone(); //had to cast it back into a HashSet
-        // this allows us to identify where there are multiple matching items
-        // by removing elements from the set as we iterate through
-        Item thisItem; // this will be an item in clone;
-        //all remaining items will be compared to it
-        int count; // this will be how many items match thisItem (at least 1)
-        while(!clone.isEmpty()){ //this runs once per set of matching items
-            Iterator<Item> itemIter = clone.iterator(); //itemIter will get elements to check
-            // matching and remove elements that have been counted from clone
-            thisItem = itemIter.next(); // retrieve the first item
-            // guaranteed to exist bc clone is not empty
-            count = 1; // set the count to 1
-            itemIter.remove(); //removes thisItem from clone
-            while(itemIter.hasNext()){ //on the last one, this will be skipped
-                if(thisItem.matches(itemIter.next())){ //found a match!
-                    count ++;
-                    itemIter.remove(); //never check it again. removed from clone
-                }
-            } //we now have the count of what matches thisItem
-            strOut += "x"+count+"\t"+thisItem.getName()+" ("+thisItem.getWeight();
-            strOut += "lbs): "+thisItem.getDescription()+"\n";
-        }
-        return strOut.trim(); //get rid of trailing \n
+        Item item;
+        int m;
+        for (Map.Entry<Item, Integer> eqItem: contents.entrySet()){
+            item = eqItem.getKey();
+            m = eqItem.getValue();
+            strOut += "x"+m+"\t"+item.getName()+" ("+item.getWeight()*m;
+            strOut += "lbs): "+item.getDescription()+"\n";
+        } // e.g. x12   coins(1 lbs): Shiny gold guau
+        return strOut.trim(); //rid trailing \n
     }
     
     // this method is ultimately for the take command, to allow checking weight capacity
@@ -148,7 +143,7 @@ public class Items
      * @return the weight of the item searched
      */
     public double getItemWeight(String itemName){
-        for (Item item:contents){
+        for (Item item:contents.keySet()){
             if (item.getName().equals(itemName)){
                 return item.getWeight();
             }
@@ -159,23 +154,9 @@ public class Items
     // This method is ulitmately to track players' carried weight
     public double getTotalWeight(){
         double totalWeight = (double) 0;      
-        for (Item item:contents){
-            totalWeight += item.getWeight();
+        for (Map.Entry<Item, Integer> eqItem: contents.entrySet()){
+            totalWeight += eqItem.getKey().getWeight()*eqItem.getValue(); //weight*num items
         }
         return totalWeight;
-    }
-
-    /**
-     * Check if the collection contains a matching item
-     * @param item the item to check
-     * @return true if a matching item is in the collection
-     */
-    public boolean containsMatching(Item item){
-        for (Item already:contents){
-            if(already.matches(item)){
-                return true;
-            }
-        }
-        return false;
     }
 }
