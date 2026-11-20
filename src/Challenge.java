@@ -40,10 +40,10 @@ public class Challenge {
         vanderHall.addExit("hall-door", plasmaLab);
         plasmaLab.addExit("lab-exit", vanderHall);
         System.out.println("Chii is in "+Chii.getCurrentRoom().getName());
-        mensRoom.acquireItem(mouse1);
-        plasmaLab.acquireItem(mouse2);
-        vanderHall.acquireItem(mouse3);
-        Chii.acquireItem(laptop);
+        //mensRoom.acquireItem(mouse1);
+        //plasmaLab.acquireItem(mouse2);
+        //vanderHall.acquireItem(mouse3);
+        //Chii.acquireItem(laptop);
         System.out.println("Challenge: get a squeaker into the plasma lab");
     }
 
