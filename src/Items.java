@@ -94,6 +94,7 @@ public class Items
                         throw new IllegalStateException("Item multiplicity is inconsistent, there is a bug");
                     }
                     contents.put(item, m-1); //decrease the multiplicity by 1
+                    dropZeroKeys(); //if now 0, remove it
                     return item; //successfully return item 
                 }
             } // the for loop should not finish!
@@ -103,13 +104,13 @@ public class Items
     }
 
     public boolean canAcquire(Item item){
-        if (item == null){
+        if (item == null || item.getName() == null || item.isNamed("")){ //illegal conditions
             return false;
         }
         for (Item already: contents.keySet()){
             if (already.equals(item)){ //same item, can acquire
                 return true;
-            } else if (already.isNamed(item.getName())){ //different item, same name, cannot acquire
+            } else if (already.isNamed(item.getName())){ //different item, same name, cannot acquire (bad match)
                 return false;
             }
         }
@@ -141,8 +142,10 @@ public class Items
         for (Map.Entry<Item, Integer> eqItem: contents.entrySet()){
             item = eqItem.getKey();
             m = eqItem.getValue();
-            strOut += "x"+m+"\t"+item.getName()+" ("+item.getWeight()*m;
-            strOut += "lbs): "+item.getDescription()+"\n";
+            if (m>0){ //otherwise don't print
+                strOut += "x"+m+"\t"+item.getName()+" ("+item.getWeight()*m;
+                strOut += " lbs): "+item.getDescription()+"\n";
+            }
         } // e.g. x12   coins(1 lbs): Shiny gold guau
         return strOut.trim(); //rid trailing \n
     }
@@ -174,5 +177,17 @@ public class Items
             totalWeight += eqItem.getKey().getWeight()*eqItem.getValue(); //weight*num items
         }
         return totalWeight;
+    }
+
+    /**
+     * Remove all elements with a value of 0
+     */
+    private void dropZeroKeys(){
+        Iterator<Integer> counts = contents.values().iterator();
+        while(counts.hasNext()){
+            if (counts.next() == 0){
+                counts.remove();
+            }
+        }
     }
 }

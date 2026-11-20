@@ -162,20 +162,21 @@ public class Player
         return goRoom(newRoom);
     }
     
-    //still might change the structure of this
-    /**
-     * Place the player in a room for the first time.
-     * 
-     * If player is already in a room, return false;
-     * @param spawnpoint the room for the player to enter
-     * @return true if the player successfully enters the room
-     */
-    public boolean spawn(Room spawnpoint){
-        if (currentRoom != null){ //disallow if already in a room
-            return false;
-        }
-        return goRoom(spawnpoint);
-    }
+    // -- REMOVED because World should do this now
+    // //still might change the structure of this
+    // /**
+    //  * Place the player in a room for the first time.
+    //  * 
+    //  * If player is already in a room, return false;
+    //  * @param spawnpoint the room for the player to enter
+    //  * @return true if the player successfully enters the room
+    //  */
+    // public boolean spawn(Room spawnpoint){
+    //     if (currentRoom != null){ //disallow if already in a room
+    //         return false;
+    //     }
+    //     return goRoom(spawnpoint);
+    // }
     
     /**
      * Return to the previous room.
@@ -258,7 +259,7 @@ public class Player
      * @return a display string of item info
      */
     public String getInventoryList(){
-        return name+"'s Inventory:\n"+inventory.list();
+        return name+"'s Inventory:\t ("+getInventoryWeight()+"/"+capacity+" lbs)\n"+inventory.list();
     }
     
     /**

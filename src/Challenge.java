@@ -12,58 +12,68 @@ public class Challenge {
     public static Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
     public static Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
     public static Player Chii = new Player("Chii",12, mensRoom);
-    public static Item laptop = new Item("laptop","sleek mac",8);
-    public static Item mouse1 = new Item("mouse","goes squeak",2);
-    public static Item mouse2 = new Item("mouse","goes click",1);
-    public static Item mouse3 = new Item("mouse","goes squeak", 2);
+    public static Item laptop = new Item("laptop","sleek mac",8,Chii);
+    public static Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
+    public static Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
+    public static Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
 
     public Challenge(){
-        Chii.spawn(mensRoom);
-        mensRoom.addExit("door", vanderHall);
-        vanderHall.addExit("push_door", mensRoom);
-        vanderHall.addExit("hall-door", plasmaLab);
-        plasmaLab.addExit("door", vanderHall);
-        System.out.println("Chii is in "+Chii.getCurrentRoom().getName());
-        mensRoom.acquireItem(mouse1);
-        plasmaLab.acquireItem(mouse2);
-        vanderHall.acquireItem(mouse3);
-        Chii.acquireItem(laptop);
-        System.out.println("Challenge: get a squeaker into the plasma lab");
+        // Chii.spawn(mensRoom);
+        // mensRoom.addExit("door", vanderHall);
+        // vanderHall.addExit("push_door", mensRoom);
+        // vanderHall.addExit("hall-door", plasmaLab);
+        // plasmaLab.addExit("door", vanderHall);
+        // System.out.println("Chii is in "+Chii.getCurrentRoom().getName());
+        // mensRoom.acquireItem(mouse1);
+        // plasmaLab.acquireItem(mouse2);
+        // vanderHall.acquireItem(mouse3);
+        // Chii.acquireItem(laptop);
+        // System.out.println("Challenge: get a squeaker into the plasma lab");
 
     }
 
     @BeforeEach
     static public void setupChallenge(){
-        Chii.spawn(mensRoom);
+        // Chii.spawn(mensRoom);
         mensRoom.addExit("bath-exit", vanderHall);
         vanderHall.addExit("push_door", mensRoom);
         vanderHall.addExit("hall-door", plasmaLab);
         plasmaLab.addExit("lab-exit", vanderHall);
         System.out.println("Chii is in "+Chii.getCurrentRoom().getName());
-        mensRoom.acquireItem(mouse1);
-        plasmaLab.acquireItem(mouse2);
-        vanderHall.acquireItem(mouse3);
-        Chii.acquireItem(laptop);
+        //mensRoom.acquireItem(mouse1);
+        //plasmaLab.acquireItem(mouse2);
+        //vanderHall.acquireItem(mouse3);
+        //Chii.acquireItem(laptop);
         System.out.println("Challenge: get a squeaker into the plasma lab");
     }
 
     static public boolean didIWin(){
-        return plasmaLab.hasMatchingItem(mouse1);
+        return plasmaLab.hasItem(mouse1);
+    }
+
+    static public void whatsUp(){
+        System.out.println("\nChii is in "+Chii.getCurrentRoom().getName());
+        System.out.println(Chii.getInventoryList());
+        System.out.println(Chii.getCurrentRoom().listItems());
     }
 
     @Test
     public void testChallenge(){
         setupChallenge();
         assertFalse(didIWin());
+        whatsUp();
+        System.out.println(mensRoom.listItems()+"\n"+mensRoom.listPlayers());
         assertTrue(Chii.pickUp("mouse"));
         assertFalse(Chii.takeExit("hall-door"));
         assertTrue(Chii.takeExit("bath-exit"));
         assertTrue(Chii.setDown("mouse"));
         assertTrue(Chii.takeExit("hall-door"));
+        whatsUp();
         assertTrue(Chii.pickUp("mouse"));
         assertTrue(Chii.takeExit("lab-exit"));
         assertFalse(Chii.setDown("mouse")); //false because same name diff descr. as mouse already in hallway
         System.out.println(Chii.getInventoryList());
+        whatsUp();
         assertFalse(Chii.pickUp("mouse")); //also false
         Chii.pickUp("mouse"); //also false
         System.out.println(Chii.getInventoryList());

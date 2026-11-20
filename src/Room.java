@@ -108,7 +108,7 @@ public class Room
      * @return a string of items contained in the room, and their information.
      */
     public String listItems(){
-        return items.list();
+        return "Items in "+name+":\n"+items.list();
     }
     
     /**
@@ -156,20 +156,20 @@ public class Room
         return true;
     }
 
-    /**
-     * Return a string describing the room's exits, for example
-     * "Exits: north west".
-     * @return Details of the room's exits.
-     */
-    private String getExitString()
-    {
-        String returnString = "Exits:";
-        Set<String> keys = exits.keySet();
-        for(String exit : keys) {
-            returnString += " " + exit;
-        }
-        return returnString;
-    }
+    // /**
+    //  * Return a string describing the room's exits, for example
+    //  * "Exits: north west".
+    //  * @return Details of the room's exits.
+    //  */
+    // private String getExitString()
+    // {
+    //     String returnString = "Exits:";
+    //     Set<String> keys = exits.keySet();
+    //     for(String exit : keys) {
+    //         returnString += " " + exit;
+    //     }
+    //     return returnString;
+    // }
 
     /**
      * Return the room that is reached if we go from this room in direction
@@ -185,14 +185,16 @@ public class Room
     /**
      * Remove an item from the room, and return it.
      * 
-     * If there is more than one item with the specified name,
-     * it will just remove/return one of them, and no particular order is guaranteed.
      * If there is no item with the specified name, return null.
      * @param itemName the name of the item to retrieve
      * @return an item with the specified name
      */
     public Item retrieveItem(String itemName){
         return items.retrieve(itemName);    
+    }
+
+    public boolean canAcquire(Item item){
+        return items.canAcquire(item); //no special rules
     }
     
     /**
@@ -201,18 +203,9 @@ public class Room
      * @return true if the item was successfully acquired
      */
     public boolean acquireItem(Item item){
-        return items.acquire(item);
+        return items.acquire(item); //handles null, bad match
     }
 
-    /**
-     * Whether an item can be acquired by the room
-     * @param item the item to check acquisability
-     * @return true if the item can be acquired
-     */
-    public boolean willAcquireItem(Item item){
-        return items.willAcquire(item);
-    }
-    
     /**
      * Remove a player from the room.
      * 
@@ -286,4 +279,3 @@ public class Room
 
 
 }
-
