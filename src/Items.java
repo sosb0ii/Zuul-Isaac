@@ -63,7 +63,10 @@ public class Items
      * @param itemName the name of the item to search for
      * @return the number of the named item which are in the collection
      */
-    public int getCount(String itemName){
+    private int getCount(String itemName){
+        if (itemName == null){
+            return 0;
+        }
         for (Item item: contents.keySet()){
             if (item.isNamed(itemName)){
                 return contents.get(item);
@@ -73,7 +76,6 @@ public class Items
     }
 
 
-
     /**
      * Remove the item with the specified name from the collection (there should only be one!), and return it.
      * If there is no item with the specified name, return null.
@@ -81,6 +83,9 @@ public class Items
      * @return an item with the specified name
      */
     public Item retrieve(String itemName){ //should GUARANTEE the item removed is the item returned
+        if (itemName == null || itemName.equals("")){ //invalid names
+            return null;
+        }
         int m = getCount(itemName); // known the multiplicity of the item
         if(m>0){ //there's something to retrieve
             for(Item item:contents.keySet()){
@@ -96,6 +101,20 @@ public class Items
         }
         return null; //m=0, return nothing
     }
+
+    public boolean canAcquire(Item item){
+        if (item == null){
+            return false;
+        }
+        for (Item already: contents.keySet()){
+            if (already.equals(item)){ //same item, can acquire
+                return true;
+            } else if (already.isNamed(item.getName())){ //different item, same name, cannot acquire
+                return false;
+            }
+        }
+        return true; //if there's no match whatsoever then we're good to go
+    }
     
     /**
      * Add an item to the collection
@@ -106,33 +125,14 @@ public class Items
      * @returns true if the item was successfully acquired
      */
     public boolean acquire(Item item){
-        if (!willAcquire(item)){ //will not acquire item
+        if (!canAcquire(item)){ //check for null or bad match
             return false;
-        } else { //will acquire!
-            int m = contents.getOrDefault(item,0);
+        } else { //can acquire!
+            int m = contents.getOrDefault(item,0); // gets value or 0 if key DNE
             contents.put(item, m+1);
             return true;
         }
     }
-
-    /**
-     * Checks if an item can be added, without adding it
-     * 
-     * If an item in the collection already has that name
-     * but a different weight or description, this returns false.
-     * @param item the item to add to the collection
-     * @returns true if the item can be acquired
-     */
-    public boolean willAcquire(Item item){
-        if (contents.containsKey(item)){ //item already in collection
-            return true;
-        } else if (contains(item.getName())){ //item not in collection, but name taken
-            return false;
-        } else { //item not in collection, name not taken
-            return true; // can acquire the item by adding it as a new key
-        }
-    }
-
 
     public String list(){
         String strOut = "";
