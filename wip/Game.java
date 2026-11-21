@@ -90,7 +90,7 @@ public class Game
             if (!success){ // let them know if the command word was valid but didn't work
                 System.out.println("That didn't work. Maybe try something different?");
             }
-            if(this.isOver()){
+            if(isOver()){ //world's victory condition reached
                 System.out.println("You have completed the game! Congratulations!");
                 keepPlaying = false;
             }
@@ -165,6 +165,10 @@ public class Game
         System.out.println();
         System.out.println("Your command words are:");
         parser.showCommands();
+    }
+
+    public boolean isOver(){
+        
     }
 
     /** 
