@@ -5,12 +5,10 @@ import java.util.*;
  * @Isaac
  * @November 6 2026
  */
-public class Player
+public class Player extends Entity
 {
-    private String name;
     private Room currentRoom;
     private ArrayList<Room> roomHistory;
-    private Items inventory;
     private double capacity;
     private String likeness;
     
@@ -20,10 +18,9 @@ public class Player
      * @param spawnpoint the room where the player starts
      */
     public Player (String name, Room spawnpoint){
-        this.name = name; //must happen before spawn
+        super(name);
         this.currentRoom = spawnpoint;
         roomHistory = new ArrayList<>();
-        inventory = new Items();
         likeness = "";
         capacity = (double) 30;
         currentRoom.spawnPlayer(this); //spawn the player in the room
@@ -34,42 +31,15 @@ public class Player
      * @param name the name of the player
      */
     public Player (String name, double capacity, Room spawnpoint){
-        this.name = name; //must happen before spawn
+        super(name);
         this.currentRoom = spawnpoint;
         roomHistory = new ArrayList<>();
-        inventory = new Items();
         likeness = "";
         this.capacity = capacity;
         currentRoom.spawnPlayer(this); //spawn the player in the room
     }
 
     
-    /**
-     * Get the name of the player
-     * @return the name of the player
-     */
-    public String getName(){
-        return name;
-    }
-
-    /**
-     * To avoid players having the same name, we add a number to repeat names
-     * 
-     * E.g., adding a "Niklas" twice would make the second one "Niklas(1)"
-     */
-    public void rename(){
-        String nameStr;
-        int count;
-        if(name.endsWith(")")){ // we've done this before
-            nameStr = name.substring(0,name.lastIndexOf("("));
-            count = Integer.parseInt(name.substring(name.lastIndexOf("(")+1,name.lastIndexOf(")")));
-        } else { //first time renaming
-            nameStr = name;
-            count = 0;
-        }
-        name = nameStr+"("+(count+1)+")";
-}
-
     /**
      * Get the room the player is currently in
      * @return the current room of the player
@@ -115,7 +85,7 @@ public class Player
      * @return the total weight of all the items in the player's inventory
      */
     public double getInventoryWeight(){
-        return inventory.getTotalWeight();
+        return getTotalWeight();
     }
     
     /**
@@ -162,21 +132,6 @@ public class Player
         return goRoom(newRoom);
     }
     
-    // -- REMOVED because World should do this now
-    // //still might change the structure of this
-    // /**
-    //  * Place the player in a room for the first time.
-    //  * 
-    //  * If player is already in a room, return false;
-    //  * @param spawnpoint the room for the player to enter
-    //  * @return true if the player successfully enters the room
-    //  */
-    // public boolean spawn(Room spawnpoint){
-    //     if (currentRoom != null){ //disallow if already in a room
-    //         return false;
-    //     }
-    //     return goRoom(spawnpoint);
-    // }
     
     /**
      * Return to the previous room.

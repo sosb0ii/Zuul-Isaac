@@ -130,7 +130,14 @@ public abstract class Entity
         name = nameStr+"("+(count+1)+")";
     }
 
-    
+    /**
+     * How total weight of items held by the entity
+     * @return the total weight of all the items in the entity's collection
+     */
+    public double getTotalWeight(){
+        return items.getTotalWeight();
+    }
+
 
 
 }
