@@ -27,7 +27,7 @@ public class Command
     public Command(String inputLine){ //have must be string, cannot be null
         Scanner tokenizer = new Scanner(inputLine);
         if(tokenizer.hasNext()) {
-            commandWord = tokenizer.next();      // get first word
+            commandWord = tokenizer.next().toLowerCase();      // get first word
         }
         while(tokenizer.hasNext()){
             args.add(tokenizer.next());

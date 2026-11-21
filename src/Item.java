@@ -166,11 +166,11 @@ public class Item
     }
     
     public boolean hasAttribute(String attribute){
-        return attributes.contains(attribute);
+        return attributes.contains(attribute.toLowerCase());
     }
 
     public void setAttribute(String attribute){
-        attributes.add(attribute);
+        attributes.add(attribute.toLowerCase());
     }
     
 }

@@ -193,4 +193,18 @@ public class Items
             }
         }
     }
+
+    /**
+     * Whether any items in the collection have the specified attribute
+     * @param attribute the attribute to search for
+     * @return true if such an item is found
+     */
+    public boolean hasItemWithAttribute(String attribute){
+        for(Item item: contents.keySet()){
+            if(item.hasAttribute(attribute)){
+                return true;
+            }
+        }
+        return false;
+    }
 }
