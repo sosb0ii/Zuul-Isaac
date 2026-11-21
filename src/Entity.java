@@ -1,7 +1,7 @@
-import java.util.*;
+// import java.util.*;
 
 /**
- * This is a parent class fro Room and Player, since they share 
+ * This is a parent class for Room and Player, since they share 
  * surprisingly many functionalities
  * 
  * @author  Isaac
@@ -13,20 +13,17 @@ public abstract class Entity
     private String name;
     private String description;
     private Items items;        // the items in this entity.
-    private final World theWorld; //must be specified on creation
     
     /**
-     * Create an entity named "name" in `World`.
+     * Create an entity named "name"
      * Description remains empty until specified.
      * @param name the entity's name
      * @param world the world this entity is in
      */
-    public Entity(String name, World world){
+    public Entity(String name){
         this.name = name;
         this.description = "";
         this.items = new Items();
-        this.theWorld = world;
-        addSelfToWorld(); // define in child as world.registerplayer() or world.addroom()
     }
     
     /**
@@ -35,22 +32,19 @@ public abstract class Entity
      * @param description the entity's description
      * @param world the world this entity is in
      */
-    public Entity(String name, String description, World world){
+    public Entity(String name, String description){
         this.name = name;
         this.description = description;
         this.items = new Items();
-        this.theWorld = world;
-        addSelfToWorld(); //add the entity to the world
     }
 
-    public abstract void addSelfToWorld();
-    
     /**
      * @return the name of the entity
      */
     public String getName(){
         return name;
     }
+
     
     /**
      * @return the description of the entity
@@ -67,17 +61,13 @@ public abstract class Entity
     public boolean hasItem(String itemName){
         return items.contains(itemName);
     }
-    
-    /**
-     * What items are in the entity
-     * @return a string of items contained in the entity, and their information.
-     */
-    public String listItems(){
-        return "Items in "+name+":\n"+items.list();
-    }
-    
-
        
+    public abstract String displayItems(); //abstract so that the header is customized
+
+    public String getItemsList(){
+        return items.list();
+    }
+
     /**
      * Remove an item from the entity, and return it.
      * 

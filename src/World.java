@@ -41,26 +41,6 @@ public class World
     }
 
     /**
-     * Add a room to the world. Happens at room construction.
-     * 
-     * Return false if the room is registered
-     * Rename room if it matches an existing name
-     * @param room the room to add to the game
-     * @return true if successful
-     */
-    public boolean addEntity(Room room){
-        if (rooms.containsValue(room)){ //room already in world. should never happen of course
-            return false;
-        }
-        // isn't a pre-existing room, but could have the same name
-        while(rooms.containsKey(room.getName())){
-            room.rename();
-        }// name is now unique
-        rooms.put(room.getName(),room);
-        return true;
-    }
-
-    /**
      * Register an unregistered player. Ultimately this happens at player creation.
      * 
      * If the player is registered, return false.
@@ -69,7 +49,6 @@ public class World
      * @return true if registration is successful
      */
     public boolean registerPlayer(Player player){
-        System.out.println("World.registerPlayer(Player player) is deprecated. Use World.addEntity(Player player) instead");
         if (players.containsValue(player)){ //already registered
             return false;
         }
@@ -80,28 +59,6 @@ public class World
         players.put(player.getName(),player);
         return true;
     }
-
-    /**
-     * Register an unregistered player. Ultimately this happens at player creation.
-     * 
-     * If the player is registered, return false.
-     * If the player has a matching name, rename the player and then register them
-     * @param player the player to register
-     * @return true if registration is successful
-     */
-    public boolean addEntity(Player player){
-        System.out.println("World.registerPlayer(Player player) is deprecated. Use World.addEntity(Player player) instead");
-        if (players.containsValue(player)){ //already registered
-            return false;
-        }
-        //isn't a registered player, but could have the same name
-        while(players.containsKey(player.getName())){
-            player.rename();
-        }// name is now unique
-        players.put(player.getName(),player);
-        return true;
-    }
-
 
     public boolean stitchExits(Room room1, String name1, Room room2, String name2){
         if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null

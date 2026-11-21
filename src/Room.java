@@ -14,14 +14,11 @@ import java.util.*;
  * @version 2016.02.29
  */
 
-public class Room 
+public class Room extends Entity
 {
-    private String name;
-    private String description;
     private HashMap<String, Room> exits;        // stores exits of this room.
-    private Items items;        // the items in this room.
     private ArrayList<Player> players; // uniqueness will be enforced by World
-    private final World theWorld; //must be specified on creation
+    private final World theWorld;
     
     /**
      * Create a room named "name" in `World`.
@@ -30,13 +27,10 @@ public class Room
      * @param world the world this room is in
      */
     public Room(String name, World world){
-        this.name = name;
-        this.description = "";
+        super(name);
         this.exits = new HashMap<>();
-        this.items = new Items();
         this.players = new ArrayList<>();
         this.theWorld = world;
-        theWorld.addRoom(this); //add the room to the world
     }
     
     /**
@@ -46,38 +40,20 @@ public class Room
      * @param world the world this room is in
      */
     public Room(String name, String description, World world){
-        this.name = name;
-        this.description = description;
+        super(name,description);
         this.exits = new HashMap<>();
-        this.items = new Items();
         this.players = new ArrayList<>();
         this.theWorld = world;
-        theWorld.addRoom(this); //add the room to the world
     }
-    
+
     /**
-     * @return the name of the room
+     * @return the world this entity is in
      */
-    public String getName(){
-        return name;
+    public World getWorld(){
+        return theWorld;
     }
-    
-    /**
-     * @return the description of the room
-     */
-    public String getDescription(){
-        return description;
-    }
-    
-    /**
-     * Whether the room has an item with the specified name
-     * @param itemName: the name of the item
-     * @return true if the room has an item with the specified name
-     */
-    public boolean hasItem(String itemName){
-        return items.contains(itemName);
-    }
-    
+
+          
     /**
      * Whether a room contains the player with the specified name
      * @param playerName the name of the player to search
@@ -101,14 +77,12 @@ public class Room
         return null;
     }
 
-
-
     /**
      * What items are in the room
      * @return a string of items contained in the room, and their information.
      */
-    public String listItems(){
-        return "Items in "+name+":\n"+items.list();
+    public String displayItems(){
+        return "Items in "+getName()+":\n"+getItemsList();
     }
     
     /**
@@ -156,25 +130,10 @@ public class Room
         return true;
     }
 
-    // /**
-    //  * Return a string describing the room's exits, for example
-    //  * "Exits: north west".
-    //  * @return Details of the room's exits.
-    //  */
-    // private String getExitString()
-    // {
-    //     String returnString = "Exits:";
-    //     Set<String> keys = exits.keySet();
-    //     for(String exit : keys) {
-    //         returnString += " " + exit;
-    //     }
-    //     return returnString;
-    // }
-
     /**
      * Return the room that is reached if we go from this room in direction
      * "direction". If there is no room in that direction, return null.
-     * @param direction The exits direction.
+     * @param direction The exit's direction.
      * @return The room in the specified direction.
      */
     public Room getExit(String direction) 
@@ -200,31 +159,7 @@ public class Room
         }
         return strOut;
     }
-       
-    /**
-     * Remove an item from the room, and return it.
-     * 
-     * If there is no item with the specified name, return null.
-     * @param itemName the name of the item to retrieve
-     * @return an item with the specified name
-     */
-    public Item retrieveItem(String itemName){
-        return items.retrieve(itemName);    
-    }
-
-    public boolean canAcquire(Item item){
-        return items.canAcquire(item); //no special rules
-    }
-    
-    /**
-     * Add an item to the room
-     * @param item the item to add to the room
-     * @return true if the item was successfully acquired
-     */
-    public boolean acquireItem(Item item){
-        return items.acquire(item); //handles null, bad match
-    }
-
+          
     /**
      * Remove a player from the room.
      * 
@@ -257,46 +192,4 @@ public class Room
         boolean spawned = addPlayer(newPlayer);
         return (registered && spawned);
     }
-
-    /**
-     * Get the weight of a specified item
-     * 
-     */
-    public double getItemWeight(String itemName){
-        return items.getItemWeight(itemName);
-    }
-
-    /**
-     * How many items are in the room
-     * @return the number of items in the room
-     */
-    public int getNumItems(){
-        return items.size();
-    }
-
-    public boolean hasItem(Item item){
-        return items.contains(item);
-    }
-
-    /**
-     * To avoid rooms having the same name, we add a number to repeat names
-     * 
-     * E.g., adding a "bathroom" twice would make the second one "bathroom(1)"
-     */
-    public void rename(){
-        String nameStr;
-        int count;
-        if(name.endsWith(")")){ // we've done this before
-            nameStr = name.substring(0,name.lastIndexOf("("));
-            count = Integer.parseInt(name.substring(name.lastIndexOf("(")+1,name.lastIndexOf(")")));
-        } else { //first time renaming
-            nameStr = name;
-            count = 0;
-        }
-        name = nameStr+"("+(count+1)+")";
-    }
-
-    
-
-
 }
