@@ -60,6 +60,17 @@ public class Command
     }
 
     /**
+     * A boolean check for the command word.
+     * Smoother syntax for a common check
+     * 
+     * @param word the word to check against commandWord
+     * @return true if word matches the commandWord
+     */
+    public boolean is(String word){
+        return commandWord.equals(word);
+    }
+
+    /**
      * The argument at the specified index, as a string
      * @param index the index of interest
      * @return the argument as a string
