@@ -53,8 +53,8 @@ public class Challenge {
 
     static public void whatsUp(){
         System.out.println("\nChii is in "+Chii.getCurrentRoom().getName());
-        System.out.println(Chii.getInventoryList());
-        System.out.println(Chii.getCurrentRoom().listItems());
+        System.out.println(Chii.displayItems());
+        System.out.println(Chii.getCurrentRoom().displayItems());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class Challenge {
         setupChallenge();
         assertFalse(didIWin());
         whatsUp();
-        System.out.println(mensRoom.listItems()+"\n"+mensRoom.listPlayers());
+        System.out.println(mensRoom.displayItems()+"\n"+mensRoom.listPlayers());
         assertTrue(Chii.pickUp("mouse"));
         assertFalse(Chii.takeExit("hall-door"));
         assertTrue(Chii.takeExit("bath-exit"));
@@ -72,11 +72,11 @@ public class Challenge {
         assertTrue(Chii.pickUp("mouse"));
         assertTrue(Chii.takeExit("lab-exit"));
         assertFalse(Chii.setDown("mouse")); //false because same name diff descr. as mouse already in hallway
-        System.out.println(Chii.getInventoryList());
+        System.out.println(Chii.displayItems());
         whatsUp();
         assertFalse(Chii.pickUp("mouse")); //also false
         Chii.pickUp("mouse"); //also false
-        System.out.println(Chii.getInventoryList());
+        System.out.println(Chii.displayItems());
         assertTrue(Chii.takeExit("push_door"));
         assertTrue(Chii.setDown("mouse")); //no mouse in here anymore
         assertTrue(Chii.takeExit("bath-exit"));

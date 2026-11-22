@@ -132,7 +132,7 @@ public class Player extends Entity
         return goRoom(newRoom);
     }
     
-    
+   
     /**
      * Return to the previous room.
      * @return true if the backtrack is successful
@@ -148,32 +148,11 @@ public class Player extends Entity
      * @param item the item to check
      * @return true if the player can acquire the item
      */
+    @Override 
     public boolean canAcquire(Item item){ //could be item or null
-        return inventory.canAcquire(item) && item.getWeight()<=canCarry();
+        return super.canAcquire(item) && item.getWeight()<=canCarry();
     }
     
-    /**
-     * Add an item to the player's inventory.
-     * Primarily for setup purposes
-     * @param item the item to add to the player's inventory
-     * @return true if the item was successfully acquired
-     */
-    public boolean acquireItem(Item item){
-        return inventory.acquire(item); //handles null, bad match, no key
-    }
-
-    /**
-     * Removes one count of the specified item from the player's inventory
-     * and returns the item.
-     * 
-     * Returns null if null string, empty string, invalid key, or 0 count
-     * @param itemName the name of the item to retrieve
-     * @return the item retrieved from the player
-     */
-    public Item retrieveItem(String itemName){
-        return inventory.retrieve(itemName); // handles null, empty name, 0 count, no key.
-    }
-
     /**
      * Attempt to pick up an item from the current room
      * @param itemName the name of the item you want to pick up
@@ -213,10 +192,10 @@ public class Player extends Entity
      * The items in the players inventory
      * @return a display string of item info
      */
-    public String getInventoryList(){
-        return name+"'s Inventory:\t ("+getInventoryWeight()+"/"+capacity+" lbs)\n"+inventory.list();
+    public String displayItems(){
+        return getName()+"'s Inventory:\t ("+getInventoryWeight()+"/"+capacity+" lbs)\n"+getItemsList();
     }
-    
+   
     /**
      * Give an item to another player
      * @param playerName the player to give the item to
@@ -239,13 +218,13 @@ public class Player extends Entity
 
     public boolean eat(String foodName){
         Item food;
-        if (inventory.contains(foodName)){
-            food = inventory.retrieve(foodName);
+        if (hasItem(foodName)){
+            food = retrieveItem(foodName);
             if (food.hasAttribute("edible")){
                 setCapacity(999);
                 return true;
             } else {
-                inventory.acquire(food); //back in inventory
+                acquireItem(food); //back in inventory
                 return false;
             }
         } else {
