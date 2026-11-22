@@ -61,6 +61,10 @@ public abstract class Entity
     public boolean hasItem(String itemName){
         return items.contains(itemName);
     }
+
+    public boolean hasItemWithAttribute(String itemName){
+        return items.hasItemWithAttribute(itemName);
+    }
        
     public abstract String displayItems(); //abstract so that the header is customized
 

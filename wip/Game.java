@@ -173,7 +173,7 @@ public class Game
     }
 
     public boolean isOver(){
-
+        return activePlayer.hasItemWithAttribute("victory_token");
     }
 
     /** 
