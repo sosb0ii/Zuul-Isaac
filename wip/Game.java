@@ -149,6 +149,7 @@ public class Game
             return true;
         } else if (commandWord.equals("inventory")){
             System.out.println(activePlayer.displayItems());
+            return true;
         }
         
         
