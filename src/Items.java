@@ -75,32 +75,18 @@ public class Items
         return 0;
     }
 
-
-    /**
-     * Remove the item with the specified name from the collection (there should only be one!), and return it.
-     * If there is no item with the specified name, return null.
-     * @param itemName the name of the item to retrieve
-     * @return an item with the specified name
-     */
-    public Item retrieve(String itemName){ //should GUARANTEE the item removed is the item returned
+    public Item retrieve(String itemName){
+        // check null or invalid
         if (itemName == null || itemName.equals("")){ //invalid names
             return null;
+        } else if (!contains(itemName)){ // no item with that name here
+            return null;
+        } else { // we have an item with that name
+            Item item = getItem(itemName); //use the hidden private method
+            subtractOne(item); // subtract 1 from the item count
+            return item;
         }
-        int m = getCount(itemName); // known the multiplicity of the item
-        if(m>0){ //there's something to retrieve
-            for(Item item:contents.keySet()){
-                if(item.isNamed(itemName)){
-                    if (contents.get(item) != m){ //something is wrong
-                        throw new IllegalStateException("Item multiplicity is inconsistent, there is a bug");
-                    }
-                    contents.put(item, m-1); //decrease the multiplicity by 1
-                    dropZeroKeys(); //if now 0, remove it
-                    return item; //successfully return item 
-                }
-            } // the for loop should not finish!
-            throw new IllegalStateException("Positive multiplicity but no item found, there is a bug");
-        }
-        return null; //m=0, return nothing
+
     }
 
     public boolean canAcquire(Item item){
@@ -129,9 +115,7 @@ public class Items
         if (!canAcquire(item)){ //check for null or bad match
             return false;
         } else { //can acquire!
-            int m = contents.getOrDefault(item,0); // gets value or 0 if key DNE
-            contents.put(item, m+1);
-            return true;
+            return addOne(item);
         }
     }
 
@@ -207,5 +191,90 @@ public class Items
             }
         }
         return false;
+    }
+
+    public String toString(){
+        ArrayList<Item> itemArray = new ArrayList<>(contents.keySet());
+        String strOut = itemArray.get(0).getName();
+        for(int i=1;i<itemArray.size();i++){
+            if (itemArray.size() != 2){ //avoid adding comma for list of 2
+                strOut += ", ";
+            }
+            if (i == itemArray.size()-1){
+                strOut += " and ";
+            }
+            strOut += itemArray.get(i).getName();
+            strOut += "["+contents.get(itemArray.get(i))+"]";
+        }
+        return strOut;
+    }
+
+    /**
+     * How many of the specified item are in the collection
+     * @param item the item to count
+     * @return the number of counts found (0 or positive int)
+     */
+    public int getCount(Item item){
+        for(Item already: contents.keySet()){
+            if (already.equals(item)){ // uses .equals() instead of hash
+                return contents.get(already);
+            }
+        }
+        return 0;
+    }
+
+    private boolean addOne(Item item){
+        Item aItem; // items already in collection that we're iterating through
+        int aCount; //counts of those items
+        for(Map.Entry<Item,Integer> already: contents.entrySet()){
+            aItem = already.getKey();
+            aCount = already.getValue();
+            if (aItem.getName().equals(item.getName())){ //names match
+                if (aItem.equals(item)){ // uses .equals() instead of hash
+                    contents.put(aItem,aCount+1); // forces it to use the existing key
+                    return true;
+                } else { // names match but not everything else, it's a bad match
+                    return false;
+                }
+            } // this item did not match
+        } // no equivalent items present
+        contents.put(item,1); // make new key
+        return true;
+    }
+
+    /**
+     * Remove 1 from the count of the given item
+     * @param item
+     * @return
+     */
+    private boolean subtractOne(Item item){
+        Item aItem;
+        int aCount;
+        for(Map.Entry<Item,Integer> already: contents.entrySet()){
+            aItem = already.getKey();
+            aCount = already.getValue();
+            if (aItem.equals(item)){ // this is the one we're looking for
+                contents.put(aItem,aCount-1);
+                if(contents.get(aItem) < 1){ //there are a gazillion ways to do these two lines, this was the clearest to me
+                    contents.remove(aItem);
+                } // else item remains in hashmap
+                return true;
+            } // else keep searching
+        } // else found no item to subtract
+        return false;
+    }
+
+    /**
+     * Get a reference to the item from its name.
+     * @param itemName
+     * @return
+     */
+    private Item getItem(String itemName){
+        for (Item item:contents.keySet()){
+            if (item.isNamed(itemName)){
+                return item;
+            }
+        }
+        return null;
     }
 }

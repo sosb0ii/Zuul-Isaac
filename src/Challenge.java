@@ -11,8 +11,10 @@ public class Challenge {
     public static Room plasmaLab = new Room("Plasma_Lab","So much fun!", cheeseWorld);
     public static Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
     public static Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
+    public static Room vanZ = new Room("VanZoeren","a veritable maze",cheeseWorld);
     public static Player Chii = new Player("Chii",12, mensRoom);
-    public static Item laptop = new Item("laptop","sleek mac",8,Chii);
+    public static Player Nik = new Player("Niklas", vanZ);
+    public static Item laptop = new Item("laptop","sleek mac",8,Nik);
     public static Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
     public static Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
     public static Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
@@ -60,6 +62,7 @@ public class Challenge {
     @Test
     public void testChallenge(){
         setupChallenge();
+        assertTrue(cheeseWorld.stitchExits(vanderHall, "east-hall", vanZ, "west-hall"));
         assertFalse(didIWin());
         whatsUp();
         System.out.println(mensRoom.displayItems()+"\n"+mensRoom.listPlayers());

@@ -138,6 +138,9 @@ public class Player extends Entity
      * @return true if the backtrack is successful
      */
     public boolean backtrack(){
+        if (roomHistory.isEmpty()){
+            return false;
+        }
         return goRoom(roomHistory.removeLast()); // essentially resets to the previous state 
     }
 
@@ -166,6 +169,7 @@ public class Player extends Entity
             currentRoom.acquireItem(item); //drop it back into the room
             return false;
         } else { // light enough, and not a bad match
+            System.out.println("Player "+getName()+" now acquiring item\n"+item.getInfoString());
             return acquireItem(item); // still safe if no key
         }
     }
@@ -193,7 +197,7 @@ public class Player extends Entity
      * @return a display string of item info
      */
     public String displayItems(){
-        return getName()+"'s Inventory:\t ("+getInventoryWeight()+"/"+capacity+" lbs)\n"+getItemsList();
+        return getName()+"'s Inventory:\t\t ("+prettyDouble(getInventoryWeight())+"/"+prettyDouble(capacity)+" lbs)\n"+getItemsList();
     }
    
     /**
@@ -230,5 +234,20 @@ public class Player extends Entity
         } else {
             return false;
         }
+    }
+
+    /**
+     * Remove trailing 0's and take out decimal from double
+     * @param num the double to make pretty
+     * @return a pretty string version of the double
+     */
+    public static String prettyDouble(double num){
+        String strOut = String.valueOf(num);
+        while(strOut.endsWith("0")){
+            strOut = strOut.substring(0,strOut.length()-1); //remove last character
+        } if (strOut.endsWith(".")){
+            strOut = strOut.substring(0,strOut.length()-1);
+        }
+        return strOut;
     }
 }

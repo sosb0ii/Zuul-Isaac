@@ -31,6 +31,7 @@ public class Room extends Entity
         this.exits = new HashMap<>();
         this.players = new ArrayList<>();
         this.theWorld = world;
+        world.addRoom(this);
     }
     
     /**
@@ -44,6 +45,7 @@ public class Room extends Entity
         this.exits = new HashMap<>();
         this.players = new ArrayList<>();
         this.theWorld = world;
+        world.addRoom(this);
     }
 
     /**

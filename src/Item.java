@@ -162,20 +162,26 @@ public class Item
      */
     public boolean equals(Item other){
         if (!name.equals(other.getName())){ //diff name
+            System.out.println("different name");
             return false;
         } else if (!description.equals(other.getDescription())){ //diff description
+            System.out.println("different description");
             return false;
         } else if (weight != other.getWeight()){// diff weight
+            System.out.println("different weight");
             return false;
         } else if (attributeCount() != other.attributeCount()){// diff number of attributes
+            System.out.println("different attribute count");
             return false;
         } else{ // still need to check individual attributes
             for(String attribute: attributes){ // check one by one
                 if(!other.hasAttribute(attribute)){
+                    System.out.println("lacked attribute"+attribute);
                     return false; //fale if not
                 }
             } // else all matched
         }
+        System.out.println("Both items match perfectly");
         return true;
     }
     

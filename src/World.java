@@ -28,7 +28,6 @@ public class World
      * @return true if successful
      */
     public boolean addRoom(Room room){
-        System.out.println("World.addRoom(Room room) is deprecated. Use World.addEntity(Room room) instead");
         if (rooms.containsValue(room)){ //room already in world. should never happen of course
             return false;
         }
@@ -62,10 +61,13 @@ public class World
 
     public boolean stitchExits(Room room1, String name1, Room room2, String name2){
         if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null
+            System.out.println("room DNE");
             return false;
         } else if (name1 == null || name2 == null || name1.isEmpty() || name2.isEmpty()){ // invalid exit names
+            System.out.println("bad exit name");
             return false;
         } else if (room1.hasExit(name1) || room2.hasExit(name2)){ // exits already exist
+            System.out.println("exit name taken");
             return false;
         } // everything good
         room1.addExit(name1, room2);

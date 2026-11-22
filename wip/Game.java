@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 /**
  *  This class is the main class of the "World of Zuul" application. 
  *  "World of Zuul" is a very simple, text based adventure game.  Users 
@@ -91,6 +89,7 @@ public class Game
             } else {
                 System.out.println("Didn't recognize that command.");
                 System.out.println("Type 'help' to see a list of valid commands.");
+                System.out.println();
                 continue; // tries again
             }
             if (success){
@@ -102,6 +101,7 @@ public class Game
                 System.out.println("You have completed the game! Congratulations!");
                 keepPlaying = false;
             }
+            System.out.println(); //feels nicer when there's a space
         } // ends when keepPlaying is false. quit or win.
         System.out.println("Thank you for playing.  Good bye.");
     }
@@ -169,9 +169,15 @@ public class Game
             } else {
                 activePlayer = activePlayer.getCurrentRoom().getPlayer(command.getArg(0));
             }
-            return activePlayer.getName() == command.getArg(0); // a little check that it succeeded
+            System.out.println(activePlayer.getName()+" vs "+command.getArg(0));
+            return activePlayer.getName().equals(command.getArg(0)); // a little check that it succeeded
         } else if (commandWord.equals("back")){
             return activePlayer.backtrack();
+        } else if (commandWord.equals("whoami")){
+            System.out.print("You are "+activePlayer.getName());
+            System.out.println(", "+activePlayer.getDescription());
+            System.out.println(activePlayer.getLikeness());
+            return true;
         }
         
         
@@ -242,7 +248,7 @@ public class Game
         Player Nik = new Player("Niklas", vanZ);
         // create items
         Item laptop = new Item("laptop","sleek mac",8,Nik);
-        laptop.addAttribute("victory_token");
+        // laptop.addAttribute("victory_token");
         Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
         mouse1.addAttribute("squeaks");
         Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
@@ -265,31 +271,6 @@ public class Game
         game.play();
     }
 
-    // /** 
-    //  * Try to in to one direction. If there is an exit, enter the new
-    //  * room, otherwise print an error message.
-    //  */
-    // private void goRoom(Command command) 
-    // {
-    //     if(!command.hasSecondWord()) {
-    //         // if there is no second word, we don't know where to go...
-    //         System.out.println("Go where?");
-    //         return;
-    //     }
-
-    //     String direction = command.getSecondWord();
-
-    //     // Try to leave current room.
-    //     Room nextRoom = currentRoom.getExit(direction);
-
-    //     if (nextRoom == null) {
-    //         System.out.println("There is no door!");
-    //     }
-    //     else {
-    //         currentRoom = nextRoom;
-    //         System.out.println(currentRoom.getLongDescription());
-    //     }
-    // }
 
     /** 
      * "Quit" was entered. Check the rest of the command to see
@@ -318,6 +299,16 @@ public class Game
     }
 
     /**
+     * 
+     * @param command
+     * @return
+     */
+    public void autoPlay(String filename){
+        parser = new Parser(filename);
+        play();
+    }
+
+    /**
      * Feedback for player when a command is successful.
      * Helpful to know the game is working
      * @param command the command to give feedback for
@@ -325,10 +316,13 @@ public class Game
      */
     public String successMessage(Command command){
         String strOut = "";
-        if (command.is("go")){
-            strOut = command.getArg(0) +" took you to " + getActivePlayer().getCurrentRoom().getName();
-        } else if (command.is("help") || command.is("look") || command.is("clear")){ // no extra feedback needed for some commands
+        ArrayList<String> noMsgCmds = new ArrayList<>(List.of("help","look","clear","inventory","whoami"));
+        if (noMsgCmds.contains(command.getCommandWord())){ // no extra feedback needed for some commands
             strOut = "";
+        } else if (command.is("go")){
+            strOut = command.getArg(0) +" took you to " + getActivePlayer().getCurrentRoom().getName();
+        } else if (command.is("switch")){
+            strOut = "you are now playing as "+getActivePlayer().getName();
         } else {
             strOut = "'"+command+"' was successful"; //toString() copies inputLine
         }
