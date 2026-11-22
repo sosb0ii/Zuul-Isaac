@@ -128,8 +128,23 @@ public class Player extends Entity
         if (!currentRoom.hasExit(exitName)){
             return false;
         }
-        Room newRoom = currentRoom.getExit(exitName);
+        Room newRoom = currentRoom.takeExit(exitName);
         return goRoom(newRoom);
+    }
+    
+    /**
+     * Attempt to unlock the named exit with a specified
+     * key, which is in the inventory
+     * @param exitName the name of the exit to try to unlock
+     * @param keyName the name of the key to try to use
+     * @return true if successful
+     */
+    public boolean unlock(String exitName, String keyName){
+        Item key = retrieveItem(keyName); // may be null
+        if (key == null){
+            return false;
+        }
+        return currentRoom.unlock(exitName, key);
     }
     
    

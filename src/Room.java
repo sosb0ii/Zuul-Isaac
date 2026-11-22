@@ -16,7 +16,7 @@ import java.util.*;
 
 public class Room extends Entity
 {
-    private HashMap<String, Room> exits;        // stores exits of this room.
+    private HashSet<Exit> exits;        // stores exits of this room.
     private ArrayList<Player> players; // uniqueness will be enforced by World
     private final World theWorld;
     
@@ -28,7 +28,7 @@ public class Room extends Entity
      */
     public Room(String name, World world){
         super(name);
-        this.exits = new HashMap<>();
+        this.exits = new HashSet<>();
         this.players = new ArrayList<>();
         this.theWorld = world;
         world.addRoom(this);
@@ -42,7 +42,7 @@ public class Room extends Entity
      */
     public Room(String name, String description, World world){
         super(name,description);
-        this.exits = new HashMap<>();
+        this.exits = new HashSet<>();
         this.players = new ArrayList<>();
         this.theWorld = world;
         world.addRoom(this);
@@ -139,22 +139,53 @@ public class Room extends Entity
      * @return true if the room has an exit with the specified name
      */
     public boolean hasExit(String exitName){
-        return exits.containsKey(exitName);
+        for (Exit exit: exits){
+            if(exit.getName().equals(exitName)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * Define an exit from this room.
+     * Define an (unlocked) exit from this room.
      * @param exitName The name of the exit.
      * @param nextRoom  The room to which the exit leads.
      * @return true if successful
      */
-    public boolean addExit(String exitName, Room nextRoom) 
-    {
-        if (exits.containsKey(exitName)){
+    public boolean addExit(String exitName, Room nextRoom){
+        if (hasExit(exitName)){ // already have exit
             return false; //failed to add exit
-        }        
-        exits.put(exitName, nextRoom);
+        } else if (exitName == null || exitName.isBlank()){
+            return false;
+        }
+        exits.add(new Exit (exitName, nextRoom));
         return true;
+    }
+
+    /**
+     * Define a (locked) exit from this room.
+     * @param exitName The name of the exit.
+     * @param nextRoom  The room to which the exit leads.
+     * @return true if successful
+     */
+    public boolean addExit(String exitName, Room nextRoom, String key) {
+        if (hasExit(exitName)){ // already have exit
+            return false; //failed to add exit
+        } else if (exitName == null || exitName.isBlank()){
+            return false;
+        }
+        exits.add(new Exit (exitName, nextRoom, key));
+        return true;
+    }
+
+    public Exit getExit(String exitName){
+        for(Exit exit:exits){
+            if(exit.getName().equals(exitName)){
+                return exit;
+            }
+        }
+        return null;
     }
 
     /**
@@ -163,9 +194,27 @@ public class Room extends Entity
      * @param direction The exit's direction.
      * @return The room in the specified direction.
      */
-    public Room getExit(String direction) 
+    public Room takeExit(String direction) 
     {
-        return exits.get(direction);
+        Exit exit = getExit(direction);
+        if (exit == null){
+            return null;
+        }
+        return exit.getRoom(); //null if unlocked
+    }
+
+    /**
+     * Attempt to unlock an exit with a key
+     * @param exitName the name of the exit to unlock
+     * @param key the key to attempt unlocking with
+     * @return whether the exit was unlocked
+     */
+    public boolean unlock(String exitName, Item key){
+        Exit exit = getExit(exitName);
+        if (exit == null){
+            return false; // invalid exit name
+        }
+        return exit.unlock(key); //true if successful
     }
 
     public String listExits(){
@@ -173,8 +222,8 @@ public class Room extends Entity
         if (exits.isEmpty()){
             return "no exit";
         }
-        ArrayList<String> exitList = new ArrayList<>(exits.keySet());
-        String strOut = exitList.get(0);
+        ArrayList<Exit> exitList = new ArrayList<>(exits);
+        String strOut = exitList.get(0).getName();
         for(int i=1;i<exitList.size();i++){
             if (exitList.size() != 2){ //avoid adding comma for list of 2
                 strOut += ", ";
@@ -182,7 +231,10 @@ public class Room extends Entity
             if (i == exitList.size()-1){
                 strOut += " or ";
             }
-            strOut += exitList.get(i);
+            strOut += exitList.get(i); // takes advantage of toString()
+            if(exitList.get(i).isLocked()){
+                strOut += "[locked]";
+            }
         }
         return strOut;
     }

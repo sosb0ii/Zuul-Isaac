@@ -59,6 +59,16 @@ public class World
         return true;
     }
 
+    /**
+     * Connect two rooms via exits.
+     * They may have different names on 
+     * different sides
+     * @param room1 Room 1
+     * @param name1 The name of the exit from room 1's side
+     * @param room2 Room 2
+     * @param name2 The name of the exit from room 2's side 
+     * @return true if successful
+     */
     public boolean stitchExits(Room room1, String name1, Room room2, String name2){
         if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null
             System.out.println("room DNE");
@@ -74,6 +84,65 @@ public class World
         room2.addExit(name2, room1);
         return true;
     }
+
+    /**
+     * Connect two rooms via exits.
+     * They may have different names on 
+     * different sides.
+     * Room 1's side is locked with a key.
+     * 
+     * @param room1 Room 1
+     * @param name1 The name of the exit from room 1's side
+     * @param key the attribute needed to unlock from room 1's side
+     * @param room2 Room 2
+     * @param name2 The name of the exit from room 2's side 
+     * @return true if successful
+     */
+    public boolean stitchExits(Room room1, String name1, String key, Room room2, String name2){
+        if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null
+            System.out.println("room DNE");
+            return false;
+        } else if (name1 == null || name2 == null || name1.isEmpty() || name2.isEmpty()){ // invalid exit names
+            System.out.println("bad exit name");
+            return false;
+        } else if (room1.hasExit(name1) || room2.hasExit(name2)){ // exits already exist
+            System.out.println("exit name taken");
+            return false;
+        } // everything good
+        room1.addExit(name1, room2, key);
+        room2.addExit(name2, room1);
+        return true;
+    }
+
+    /**
+     * Connect two rooms via exits.
+     * They may have different names on 
+     * different sides.
+     * Both sides are locked with a key.
+     * 
+     * @param room1 Room 1
+     * @param name1 The name of the exit from room 1's side
+     * @param key the attribute needed to unlock from room 1's side
+     * @param room2 Room 2
+     * @param name2 The name of the exit from room 2's side 
+     * @return true if successful
+     */
+    public boolean stitchExits(Room room1, String name1, Room room2, String name2, String key){
+        if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null
+            System.out.println("room DNE");
+            return false;
+        } else if (name1 == null || name2 == null || name1.isEmpty() || name2.isEmpty()){ // invalid exit names
+            System.out.println("bad exit name");
+            return false;
+        } else if (room1.hasExit(name1) || room2.hasExit(name2)){ // exits already exist
+            System.out.println("exit name taken");
+            return false;
+        } // everything good
+        room1.addExit(name1, room2, key);
+        room2.addExit(name2, room1, key);
+        return true;
+    }
+
 
     /**
      * Whether the named player is in the world

@@ -178,6 +178,8 @@ public class Game
             System.out.println(", "+activePlayer.getDescription());
             System.out.println(activePlayer.getLikeness());
             return true;
+        } else if (commandWord.equals("unlock")){
+            return activePlayer.unlock(command.getArg(0), command.getArg(1));
         }
         
         
@@ -367,19 +369,46 @@ public class Game
             example = "go double-doors";
         } else if (commandName.equals("clear")){
             explain = "clear the screen";
+        } else if (commandName.equals("eat")){
+            explain = "attempt to eat an item\nitem must be edible";
+            parameters.add("item");
+            tip = "use 'inventory' to see what edible items you have\n";
+            parameters.add("player");
+        } else if (commandName.equals("look")){
+            explain = "look around";
+            tip = "just try it!";
+        } else if (commandName.equals("inventory")){
+            explain = "see what's in your inventory";
+            tip = "just try it!";
         } else if (commandName.equals("take")){
             explain = "try to pick up an item from the room you are in";
             tip = "use 'look' to see available items\nuse 'inventory' to check carrying capacity";
-            parameters.add("item-name");
+            parameters.add("item");
+        } else if (commandName.equals("drop")){
+            explain = "drop an item from your inventory into the current room";
+            parameters.add("item");
+            tip = "use 'inventory' to see what you can drop";
         } else if (commandName.equals("give")){
             explain = "try to give an item to another player in your room";
             tip = "use 'look' to see players in the room\nuse 'inventory' to see items you can give";
-            parameters.add("player-name");
-            parameters.add("item-name");
+            parameters.add("player");
+            parameters.add("item-me");
         } else if (commandName.equals("switch")){
             explain = "switch to controlling another player in the same room\ncannot play NPC's";
-            tip = "use 'look' to see players in the room\n";
-            parameters.add("player-name");
+            tip = "use 'look' to see players in the room";
+            parameters.add("player");
+        } else if (commandName.equals("back")){
+            nargs = 0;
+            explain = "return to the previous room";
+        } else if (commandName.equals("whoami")){
+            explain = "who am I?";
+            tip = "just try it!";
+        } else if (commandName.equals("unlock")){
+            explain = "try to unlock an exit using an item in your inventory as a key";
+            tip = "use 'look' to see locked exits\nuse 'inventory' to see what items you can use";
+            parameters.add("exit");
+            parameters.add("item");
+            example = "unlock gate crystal";
         } else {
             tip = "use common sense";
         }
