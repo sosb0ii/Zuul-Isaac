@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -20,6 +23,7 @@ public class Parser
 {
     private CommandWords commands;  // holds all valid command words
     private Scanner reader;         // source of command input
+    private boolean isFileInput = false; //only true if reading from file
 
     /**
      * Create a parser to read from the terminal window.
@@ -28,6 +32,33 @@ public class Parser
     {
         commands = new CommandWords();
         reader = new Scanner(System.in);
+    }
+
+    /**
+     * Create a parser from a file.
+     */
+    public Parser(String filename) {
+        commands = new CommandWords();
+        try { 
+            reader = new Scanner(new File(filename));
+        } catch (FileNotFoundException e) {
+            System.out.println("Cannot find the file "+filename);
+            System.out.println("Reverting to use the command line for input.");
+            reader = new Scanner(System.in);
+        } catch (IOException e) {
+            System.out.println("Error with File I/O:");
+            e.printStackTrace();
+            System.out.println("Reverting to use the command line for input.");
+            reader = new Scanner(System.in);
+        } 
+        isFileInput=true;
+    }
+    
+    /**
+     * @return true if the input is from a file and false if it is from std.in.
+     */
+    public boolean usingFile() {
+        return isFileInput;
     }
 
     /**

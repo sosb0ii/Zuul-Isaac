@@ -37,40 +37,40 @@ public class Game
      */
     public Game() 
     {
-        world = World.default();
+        // world = World.default();
         parser = new Parser();
     }
 
-    /**
-     * Create all the rooms and link their exits together.
-     */
-    private void createRooms()
-    {
-        Room outside, theater, pub, lab, office;
+    // /**
+    //  * Create all the rooms and link their exits together.
+    //  */
+    // private void createRooms()
+    // {
+    //     Room outside, theater, pub, lab, office;
       
-        // create the rooms
-        outside = new Room("outside the main entrance of the university");
-        theater = new Room("in a lecture theater");
-        pub = new Room("in the campus pub");
-        lab = new Room("in a computing lab");
-        office = new Room("in the computing admin office");
+    //     // create the rooms
+    //     outside = new Room("outside the main entrance of the university");
+    //     theater = new Room("in a lecture theater");
+    //     pub = new Room("in the campus pub");
+    //     lab = new Room("in a computing lab");
+    //     office = new Room("in the computing admin office");
         
-        // initialise room exits
-        outside.setExit("east", theater);
-        outside.setExit("south", lab);
-        outside.setExit("west", pub);
+    //     // initialise room exits
+    //     outside.setExit("east", theater);
+    //     outside.setExit("south", lab);
+    //     outside.setExit("west", pub);
 
-        theater.setExit("west", outside);
+    //     theater.setExit("west", outside);
 
-        pub.setExit("east", outside);
+    //     pub.setExit("east", outside);
 
-        lab.setExit("north", outside);
-        lab.setExit("east", office);
+    //     lab.setExit("north", outside);
+    //     lab.setExit("east", office);
 
-        office.setExit("west", lab);
+    //     office.setExit("west", lab);
 
-        currentRoom = outside;  // start game outside
-    }
+    //     currentRoom = outside;  // start game outside
+    // }
 
     /**
      *  Main play routine.  Loops until end of play.
@@ -106,9 +106,9 @@ public class Game
         System.out.println();
         System.out.println("Welcome to the World of Zuul!");
         System.out.println("World of Zuul is a new, incredibly boring adventure game.");
+        System.out.println("You are in "+activePlayer.getCurrentRoom().getDescription());
         System.out.println("Type 'help' if you need help.");
         System.out.println();
-        System.out.println(currentRoom.getLongDescription());
     }
 
     /**
@@ -144,10 +144,15 @@ public class Game
             System.out.print("You are in "+activePlayer.getCurrentRoom().getName()); //identify room
             System.out.println(", "+activePlayer.getCurrentRoom().getDescription());
             System.out.println("\nYou see "+activePlayer.getCurrentRoom().listPlayers()+" in the room");
-            System.out.println(activePlayer.getCurrentRoom().listItems());
+            System.out.println(activePlayer.getCurrentRoom().displayItems());
             System.out.println("\nYou can exit via "+activePlayer.getCurrentRoom().listExits());
             return true;
-        } // else something went wrong
+        } else if (commandWord.equals("inventory")){
+            System.out.println(activePlayer.displayItems());
+        }
+        
+        
+        // else something went wrong
         return false;
     }
 
@@ -161,14 +166,14 @@ public class Game
     private void printHelp() 
     {
         System.out.println("You are lost. You are alone. You wander");
-        System.out.println("around at the university.");
+        System.out.println("around.");
         System.out.println();
         System.out.println("Your command words are:");
         parser.showCommands();
     }
 
     public boolean isOver(){
-        
+
     }
 
     /** 

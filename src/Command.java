@@ -22,9 +22,11 @@ public class Command
 {
     private String commandWord;
     private ArrayList<String> args; //commands with any number of words
+    private String inputLine;
     // private boolean isValid; //whether the command is valid or not
 
     public Command(String inputLine){ //have must be string, cannot be null
+        this.inputLine = inputLine;
         Scanner tokenizer = new Scanner(inputLine);
         if(tokenizer.hasNext()) {
             commandWord = tokenizer.next().toLowerCase();      // get first word
@@ -104,5 +106,33 @@ public class Command
     // {
     //     return (secondWord != null);
     // }
+
+    /**
+     * Overriding the toString method.
+     */
+    public String toString() {
+        return inputLine;
+        // String strOut = "";
+        // if (commandWord != null && !commandWord.isBlank()){ //add the command word to the string
+        //     strOut += commandWord;
+        // }
+
+        // if(commandWord!=null) {
+        //     if(secondWord!=null) {
+        //         return commandWord+" "+secondWord;
+        //     } else {
+        //         return commandWord;
+        //     }
+        // } 
+        
+        
+        // else {
+        //     if(secondWord!=null) {
+        //         return secondWord;
+        //     } else {
+        //         return "";
+        //     }
+        // }
+    }
 }
 
