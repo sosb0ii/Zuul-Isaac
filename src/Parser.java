@@ -30,7 +30,7 @@ public class Parser
      */
     public Parser() 
     {
-        commands = new CommandWords();
+        commands = new CommandWords(); //completely unneccessaryy???
         reader = new Scanner(System.in);
     }
 

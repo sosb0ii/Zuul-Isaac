@@ -32,6 +32,7 @@ public class Item
         this.name = name;
         this.description = description;
         this.weight = weight;
+        this.attributes = new HashSet<>()
         boolean added = owner.acquireItem(this);
         if (!added){ //if the item was not added to the player, it is not created
             System.out.println("Unable to add "+name+"to player: "+owner.getName());
@@ -55,6 +56,7 @@ public class Item
         this.name = name;
         this.description = description;
         this.weight = weight;
+        this.attributes = new HashSet<>()
         boolean added = location.acquireItem(this);
         if (!added){ //if the item was not added to the player, it is not created
             System.out.println("Unable to add "+name+"to room: "+location.getName());
@@ -173,8 +175,12 @@ public class Item
         return attributes.contains(attribute.toLowerCase());
     }
 
-    public void setAttribute(String attribute){
+    public void addAttribute(String attribute){
         attributes.add(attribute.toLowerCase());
+    }
+
+    public boolean removeAttribute(String attribute){
+        return attributes.remove(attribute.toLowerCase());
     }
     
 }

@@ -68,6 +68,14 @@ public class Command
         }
         return args.get(index);
     }
+
+    /**
+     * Whether the command has arguments (other than the command word)
+     * @return true if there is at least one argument
+     */
+    public boolean hasArgs(){
+        return !args.isEmpty();
+    }
     // /**
     //  * Create a command object. First and second word must be supplied, but
     //  * either one (or both) can be null.

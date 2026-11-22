@@ -132,8 +132,7 @@ public class Game
             return activePlayer.takeExit(command.getArg(0));
         }
         else if (commandWord.equals("quit")) {
-            keepPlaying = false;
-            return true;
+            return quit(command); // if successful, keepPlaying=false and return true
         }
         else if (commandWord.equals("clear")) {
             clearDisplay();
@@ -172,35 +171,80 @@ public class Game
         parser.showCommands();
     }
 
-    public boolean isOver(){
-        return activePlayer.hasItemWithAttribute("victory_token");
-    }
-
-    /** 
-     * Try to in to one direction. If there is an exit, enter the new
-     * room, otherwise print an error message.
+    /**
+     * @return true if the win condition has been reached
      */
-    private void goRoom(Command command) 
-    {
-        if(!command.hasSecondWord()) {
-            // if there is no second word, we don't know where to go...
-            System.out.println("Go where?");
-            return;
-        }
-
-        String direction = command.getSecondWord();
-
-        // Try to leave current room.
-        Room nextRoom = currentRoom.getExit(direction);
-
-        if (nextRoom == null) {
-            System.out.println("There is no door!");
-        }
-        else {
-            currentRoom = nextRoom;
-            System.out.println(currentRoom.getLongDescription());
-        }
+    public boolean isOver(){
+        // return activePlayer.hasItemWithAttribute("victory_token");
+        return activePlayer.getCurrentRoom().hasItemWithAttribute("squeaks");
     }
+
+    public World getWorld(){
+        return world;
+    }
+
+    private void setWorld(World world){
+        this.world = world;
+    }
+
+    public void setActivePlayer(Player player){
+        activePlayer = player;
+    }
+    public Player getActivePlayer(){
+        return activePlayer;
+    }
+
+    //testing the setup. REMOVE LATER!!
+    public static void main(String[] args) {
+        World cheeseWorld = new World();
+        Room plasmaLab = new Room("Plasma_Lab","So much fun!", cheeseWorld);
+        Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
+        Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
+        Player Chii = new Player("Chii",12, mensRoom);
+        Item laptop = new Item("laptop","sleek mac",8,Chii);
+        Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
+        mouse1.addAttribute("squeaks");
+        Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
+        mouse2.addAttribute("clicks");
+        Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
+        mouse3.addAttribute("squeaks");
+        mensRoom.addExit("bath-exit", vanderHall);
+        vanderHall.addExit("push_door", mensRoom);
+        vanderHall.addExit("hall-door", plasmaLab);
+        plasmaLab.addExit("lab-exit", vanderHall);
+        Game game = new Game();
+        game.setWorld(cheeseWorld);
+        game.setActivePlayer(Chii);
+        System.out.println(game.getActivePlayer().getName()+" is in "+Chii.getCurrentRoom().getName());
+        System.out.println("Challenge: get a squeaker into the plasma lab");
+        game.play();
+    }
+
+    // /** 
+    //  * Try to in to one direction. If there is an exit, enter the new
+    //  * room, otherwise print an error message.
+    //  */
+    // private void goRoom(Command command) 
+    // {
+    //     if(!command.hasSecondWord()) {
+    //         // if there is no second word, we don't know where to go...
+    //         System.out.println("Go where?");
+    //         return;
+    //     }
+
+    //     String direction = command.getSecondWord();
+
+    //     // Try to leave current room.
+    //     Room nextRoom = currentRoom.getExit(direction);
+
+    //     if (nextRoom == null) {
+    //         System.out.println("There is no door!");
+    //     }
+    //     else {
+    //         currentRoom = nextRoom;
+    //         System.out.println(currentRoom.getLongDescription());
+    //     }
+    // }
 
     /** 
      * "Quit" was entered. Check the rest of the command to see
@@ -209,12 +253,13 @@ public class Game
      */
     private boolean quit(Command command) 
     {
-        if(command.hasSecondWord()) {
+        if(command.hasArgs()) {
             System.out.println("Quit what?");
             return false;
         }
         else {
-            return true;  // signal that we want to quit
+            keepPlaying = false;
+            return true;  // true bc command successful
         }
     }
     
