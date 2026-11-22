@@ -110,6 +110,28 @@ public class Room extends Entity
     }
 
     /**
+     * What players are in the room
+     * @return a string of the players present in the room
+     */
+    public String listPlayers(){
+        if (players.isEmpty()){
+            return "nobody";
+        }
+        String strOut = players.get(0).getName();
+        for(int i=1;i<players.size();i++){
+            if (players.size() != 2){ //avoid adding comma for list of 2
+                strOut += ", ";
+            }
+            if (i == players.size()-1){
+                strOut += " and ";
+            }
+            strOut += players.get(i).getName();
+        }
+        return strOut;
+    }
+
+
+    /**
      * Whether the room has an exit with the specified name
      * @param exitName: the name of the exit
      * @return true if the room has an exit with the specified name

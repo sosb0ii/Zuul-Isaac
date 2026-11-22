@@ -117,9 +117,9 @@ public class Item
      * moneybag (3.2 lbs): A pouch of coins
      */
     public String getInfoString(){
-        String strOut = name+" ("+weight+" lbs): " +description.toUpperCase();
+        String strOut = name+" ("+weight+" lbs): " +description;
         if (!attributes.isEmpty()){
-            strOut += "\n[" + String.join(", ",attributes);
+            strOut += "\n[" + String.join(", ",attributes)+"]";
         }
         return strOut;
     }
@@ -167,9 +167,16 @@ public class Item
             return false;
         } else if (weight != other.getWeight()){// diff weight
             return false;
-        } else{ // all same
-            return true;
+        } else if (attributeCount() != other.attributeCount()){// diff number of attributes
+            return false;
+        } else{ // still need to check individual attributes
+            for(String attribute: attributes){ // check one by one
+                if(!other.hasAttribute(attribute)){
+                    return false; //fale if not
+                }
+            } // else all matched
         }
+        return true;
     }
     
     public boolean hasAttribute(String attribute){
@@ -182,6 +189,10 @@ public class Item
 
     public boolean removeAttribute(String attribute){
         return attributes.remove(attribute.toLowerCase());
+    }
+
+    public int attributeCount(){
+        return attributes.size();
     }
     
 }

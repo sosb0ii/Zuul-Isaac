@@ -146,8 +146,9 @@ public class Items
             item = eqItem.getKey();
             m = eqItem.getValue();
             if (m>0){ //otherwise don't print
-                strOut += "x"+m+"\t"+item.getName()+" ("+item.getWeight()*m;
-                strOut += " lbs): "+item.getDescription()+"\n";
+                strOut += "x"+m+"\t"+item.getInfoString()+"\n";
+                // strOut += "x"+m+"\t"+item.getName()+" ("+item.getWeight()*m;
+                // strOut += " lbs): "+item.getDescription()+"\n";
             }
         } // e.g. x12   coins(1 lbs): Shiny gold guau
         return strOut.trim(); //rid trailing \n

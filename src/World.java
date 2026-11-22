@@ -72,5 +72,14 @@ public class World
         room2.addExit(name2, room1);
         return true;
     }
+
+    /**
+     * Whether the named player is in the world
+     * @param playerName the name of the player to search
+     * @return true if the player is in the world
+     */
+    public boolean hasPlayer(String playerName){
+        return players.containsKey(playerName);
+    }
     
 }

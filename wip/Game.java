@@ -127,22 +127,17 @@ public class Game
      */
     private boolean processCommand(Command command) 
     {
-
-        if(command == null || !command.isValid()) {
-            System.out.println("That didn't make sense. Type 'help' for a list of valid commands.");
-            return true; //avoid printing two error messages
-        }
         String commandWord = command.getCommandWord();
         if (commandWord.equals("help")) {
-            printHelp();
+            if (command.hasArgs()){
+                System.out.println(helpMessage(command.getArg(0)));
+            } else {
+                printHelp();
+            }
             return true;
         }
         else if (commandWord.equals("go")) {
-            boolean went = activePlayer.takeExit(command.getArg(0));
-            if (went){
-                printRoom(); //tell about the new room
-            }
-            return went;
+            return activePlayer.takeExit(command.getArg(0));
         }
         else if (commandWord.equals("quit")) {
             return quit(command); // if successful, keepPlaying=false and return true
@@ -156,7 +151,7 @@ public class Game
             System.out.print("You are in "+activePlayer.getCurrentRoom().getName()); //identify room
             System.out.println(", "+activePlayer.getCurrentRoom().getDescription());
             System.out.println("\nYou see "+activePlayer.getCurrentRoom().listOtherPlayers(activePlayer)+" in the room");
-            System.out.println(activePlayer.getCurrentRoom().displayItems());
+            System.out.println("\n"+activePlayer.getCurrentRoom().displayItems());
             System.out.println("\nYou can exit via "+activePlayer.getCurrentRoom().listExits());
             return true;
         } else if (commandWord.equals("inventory")){
@@ -164,6 +159,19 @@ public class Game
             return true;
         } else if (commandWord.equals("take")){
             return activePlayer.pickUp(command.getArg(0));
+        } else if (commandWord.equals("drop")){
+            return activePlayer.setDown(command.getArg(0));
+        } else if (commandWord.equals("give")){
+            return activePlayer.givePlayerItem(command.getArg(0), command.getArg(1));
+        } else if (commandWord.equals("switch")){
+            if (!activePlayer.getCurrentRoom().hasPlayer(command.getArg(0))){
+                return false; // target player not found in room
+            } else {
+                activePlayer = activePlayer.getCurrentRoom().getPlayer(command.getArg(0));
+            }
+            return activePlayer.getName() == command.getArg(0); // a little check that it succeeded
+        } else if (commandWord.equals("back")){
+            return activePlayer.backtrack();
         }
         
         
@@ -184,6 +192,9 @@ public class Game
         System.out.println();
         System.out.println("Your command words are:");
         parser.showCommands();
+        System.out.println();
+        System.out.println("for more help with a command, type 'help <command>'");
+        System.out.println("where <command> is the name of the command");
     }
 
     /**
@@ -219,12 +230,18 @@ public class Game
 
     //testing the setup. REMOVE LATER!!
     public static void main(String[] args) {
+        // create world
         World cheeseWorld = new World();
+        // create rooms
         Room plasmaLab = new Room("Plasma_Lab","So much fun!", cheeseWorld);
         Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
         Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
+        Room vanZ = new Room("VanZoeren","a veritable maze",cheeseWorld);
+        // create players
         Player Chii = new Player("Chii",12, mensRoom);
-        Item laptop = new Item("laptop","sleek mac",8,plasmaLab);
+        Player Nik = new Player("Niklas", vanZ);
+        // create items
+        Item laptop = new Item("laptop","sleek mac",8,Nik);
         laptop.addAttribute("victory_token");
         Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
         mouse1.addAttribute("squeaks");
@@ -232,10 +249,14 @@ public class Game
         mouse2.addAttribute("clicks");
         Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
         mouse3.addAttribute("squeaks");
+        // connect exits
         mensRoom.addExit("bath-exit", vanderHall);
         vanderHall.addExit("push_door", mensRoom);
         vanderHall.addExit("hall-door", plasmaLab);
         plasmaLab.addExit("lab-exit", vanderHall);
+        // new way of connecting exits
+        cheeseWorld.stitchExits(vanderHall,"hallway-east", vanZ,"hallway-west");
+        //generate game, set world & active player
         Game game = new Game();
         game.setWorld(cheeseWorld);
         game.setActivePlayer(Chii);
@@ -291,7 +312,9 @@ public class Game
      * Clear the interface
      */
     private void clearDisplay(){
-        System.out.println("\n".repeat(40));
+        System.out.print("\033[H\033[2J"); // clears VS Code terminal
+        System.out.print('\u000C'); // should clear BlueJ terminal
+        System.out.flush();
     }
 
     /**
@@ -303,7 +326,9 @@ public class Game
     public String successMessage(Command command){
         String strOut = "";
         if (command.is("go")){
-            strOut = "took " + command.getArg(0) +" to " + getActivePlayer().getCurrentRoom().getName();
+            strOut = command.getArg(0) +" took you to " + getActivePlayer().getCurrentRoom().getName();
+        } else if (command.is("help") || command.is("look") || command.is("clear")){ // no extra feedback needed for some commands
+            strOut = "";
         } else {
             strOut = "'"+command+"' was successful"; //toString() copies inputLine
         }
@@ -321,7 +346,7 @@ public class Game
         if (command.is("go")){
             strOut += "couldn't take exit " + command.getArg(0);
         } else {
-            strOut += "'"+command+"' was successful"; //toString() copies inputLine
+            strOut += "'"+command+"' was unsuccessful"; //toString() copies inputLine
         }
         strOut += "\n\nfor help, type 'help "+command.getCommandWord()+"'";
         return strOut;
@@ -329,10 +354,10 @@ public class Game
 
     /**
      * Help for each command.
-     * @param command the command to give help for
+     * @param commandName the name of the command to get help for
      * @return a string with helpful information
      */
-    public String helpMessage(Command command){
+    public String helpMessage(String commandName){
         // first initialize command info that might be specified in each help string
         int nargs = -1;
         ArrayList<String> parameters = new ArrayList<>();
@@ -340,12 +365,27 @@ public class Game
         String tip = "";
         String example = "";
         // then filter the command names and add info accordingly
-        if (command.is("go")){
+        if (commandName.equals("go")){
             nargs = 1;
             explain = "go somewhere by taking a specified exit";
             tip = "use 'look' to see available exits";
             parameters.add("exit");
             example = "go double-doors";
+        } else if (commandName.equals("clear")){
+            explain = "clear the screen";
+        } else if (commandName.equals("take")){
+            explain = "try to pick up an item from the room you are in";
+            tip = "use 'look' to see available items\nuse 'inventory' to check carrying capacity";
+            parameters.add("item-name");
+        } else if (commandName.equals("give")){
+            explain = "try to give an item to another player in your room";
+            tip = "use 'look' to see players in the room\nuse 'inventory' to see items you can give";
+            parameters.add("player-name");
+            parameters.add("item-name");
+        } else if (commandName.equals("switch")){
+            explain = "switch to controlling another player in the same room\ncannot play NPC's";
+            tip = "use 'look' to see players in the room\n";
+            parameters.add("player-name");
         } else {
             tip = "use common sense";
         }
@@ -356,13 +396,13 @@ public class Game
         // finally structure the output string
         String strOut = "";
         if (nargs != -1){
-            strOut += command.getCommandWord()+" ["+nargs+" argument(s)]";
+            strOut += commandName +" ["+nargs+" arguments]";
         }
         if (!explain.isEmpty()){
             strOut += "\n"+explain;
         }
         if (!parameters.isEmpty()){
-            strOut += "\n\nusage: "+command.getCommandWord()+" "+String.join(" ", parameters);
+            strOut += "\n\nusage: "+commandName+" <"+String.join("> <", parameters)+">";
         }
         if (!example.isEmpty()){
             strOut += "\n\nfor example:\n"+example;
@@ -370,7 +410,7 @@ public class Game
         if (!tip.isEmpty()){
             strOut += "\n\nhere's a tip: "+tip;
         }
-        return strOut;
+        return strOut.trim();
     }
 
     
