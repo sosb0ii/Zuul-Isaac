@@ -114,7 +114,11 @@ public class Item
      * moneybag (3.2 lbs): A pouch of coins
      */
     public String getInfoString(){
-        return name+" ("+weight+" lbs): " +description.toUpperCase();
+        String strOut = name+" ("+weight+" lbs): " +description.toUpperCase();
+        if (!attributes.isEmpty()){
+            strOut += "\n[" + String.join(", ",attributes);
+        }
+        return strOut;
     }
     
     /**

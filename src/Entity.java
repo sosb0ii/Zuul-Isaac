@@ -62,8 +62,13 @@ public abstract class Entity
         return items.contains(itemName);
     }
 
-    public boolean hasItemWithAttribute(String itemName){
-        return items.hasItemWithAttribute(itemName);
+    /**
+     * Whether the internal collection of Items contains one with the specified attribute
+     * @param attribute the attribute to search for 
+     * @return true if an item with the attribute is found
+     */
+    public boolean hasItemWithAttribute(String attribute){
+        return items.hasItemWithAttribute(attribute);
     }
        
     public abstract String displayItems(); //abstract so that the header is customized
