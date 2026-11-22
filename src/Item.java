@@ -22,47 +22,48 @@ public class Item
      * name = "moneybag"
      * description = "a pouch of coins"
      * weight = 3.2
+     * startingPoint = "bank"
      * 
      * @param name the name of the item
      * @param description the description of the item
      * @param weight the weight of the item
-     * @param owner the player to have the item
+     * @param startingPoint the player/room to have the item
      */
-    public Item (String name, String description, double weight, Player owner){
+    public Item (String name, String description, double weight, Entity startingPoint){
         this.name = name;
         this.description = description;
         this.weight = weight;
-        this.attributes = new HashSet<>()
-        boolean added = owner.acquireItem(this);
+        this.attributes = new HashSet<>();
+        boolean added = startingPoint.acquireItem(this);
         if (!added){ //if the item was not added to the player, it is not created
-            System.out.println("Unable to add "+name+"to player: "+owner.getName());
+            System.out.println("Unable to add "+name+"to player: "+startingPoint.getName());
         }
 
     }
-    /**
-     * Create the item by specifying its name, description, and weight
-     * 
-     * For example,
-     * name = "moneybag"
-     * description = "a pouch of coins"
-     * weight = 3.2
-     * 
-     * @param name the name of the item
-     * @param description the description of the item
-     * @param weight the weight of the item
-     * @param location the room to have the item
-     */
-    public Item (String name, String description, double weight, Room location){
-        this.name = name;
-        this.description = description;
-        this.weight = weight;
-        this.attributes = new HashSet<>()
-        boolean added = location.acquireItem(this);
-        if (!added){ //if the item was not added to the player, it is not created
-            System.out.println("Unable to add "+name+"to room: "+location.getName());
-        }
+    // /**
+    //  * Create the item by specifying its name, description, and weight
+    //  * 
+    //  * For example,
+    //  * name = "moneybag"
+    //  * description = "a pouch of coins"
+    //  * weight = 3.2
+    //  * 
+    //  * @param name the name of the item
+    //  * @param description the description of the item
+    //  * @param weight the weight of the item
+    //  * @param location the room to have the item
+    //  */
+    // public Item (String name, String description, double weight, Room location){
+    //     this.name = name;
+    //     this.description = description;
+    //     this.weight = weight;
+    //     this.attributes = new HashSet<>()
+    //     boolean added = location.acquireItem(this);
+    //     if (!added){ //if the item was not added to the player, it is not created
+    //         System.out.println("Unable to add "+name+"to room: "+location.getName());
+    //     }
 
-    }
+    // }
 
     //mainly for quick testing
     /**
