@@ -20,13 +20,15 @@ import java.util.*;
 
 public class Command
 {
+    private String inputLine;
     private String commandWord;
     private ArrayList<String> args; //commands with any number of words
-    private String inputLine;
     // private boolean isValid; //whether the command is valid or not
 
     public Command(String inputLine){ //have must be string, cannot be null
         this.inputLine = inputLine;
+        commandWord = ""; //initialize with empty string to avoid null errors
+        args = new ArrayList<>();
         Scanner tokenizer = new Scanner(inputLine);
         if(tokenizer.hasNext()) {
             commandWord = tokenizer.next().toLowerCase();      // get first word
@@ -74,7 +76,7 @@ public class Command
      * @return true if there is at least one argument
      */
     public boolean hasArgs(){
-        return !(args == null || args.isEmpty());
+        return !args.isEmpty();
     }
     // /**
     //  * Create a command object. First and second word must be supplied, but
