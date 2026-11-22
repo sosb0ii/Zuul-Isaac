@@ -86,22 +86,25 @@ public class Room extends Entity
     }
     
     /**
-     * What players are in the room
-     * @return a string of the players present in the room
+     * What other players are in the room
+     * @param activePlayer the player to exclude from the list
+     * @return a string of the other players present in the room
      */
-    public String listPlayers(){
-        if (players.isEmpty()){
+    public String listOtherPlayers(Player activePlayer){
+        ArrayList<Player> otherPlayers = new ArrayList<>(players);
+        otherPlayers.remove(activePlayer); // no error if activePlayer not present
+        if (otherPlayers.isEmpty()){
             return "nobody";
         }
-        String strOut = players.get(0).getName();
-        for(int i=1;i<players.size();i++){
-            if (players.size() != 2){ //avoid adding comma for list of 2
+        String strOut = otherPlayers.get(0).getName();
+        for(int i=1;i<otherPlayers.size();i++){
+            if (otherPlayers.size() != 2){ //avoid adding comma for list of 2
                 strOut += ", ";
             }
-            if (i == players.size()-1){
+            if (i == otherPlayers.size()-1){
                 strOut += " and ";
             }
-            strOut += players.get(i).getName();
+            strOut += otherPlayers.get(i).getName();
         }
         return strOut;
     }

@@ -74,7 +74,7 @@ public class Command
      * @return true if there is at least one argument
      */
     public boolean hasArgs(){
-        return !args.isEmpty();
+        return !(args == null || args.isEmpty());
     }
     // /**
     //  * Create a command object. First and second word must be supplied, but

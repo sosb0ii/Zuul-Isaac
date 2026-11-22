@@ -23,7 +23,7 @@ public class Game
     private Parser parser;
     private World world;
     private Player activePlayer;
-    private boolean quitGame;
+    // private boolean quitGame;
     private boolean keepPlaying;
     //private Room currentRoom;
     //private ArrayList<Room> roomHistory;
@@ -106,7 +106,8 @@ public class Game
         System.out.println();
         System.out.println("Welcome to the World of Zuul!");
         System.out.println("World of Zuul is a new, incredibly boring adventure game.");
-        System.out.println("You are in "+activePlayer.getCurrentRoom().getDescription());
+        System.out.print("You are in "+activePlayer.getCurrentRoom().getName());
+        System.out.println(", "+activePlayer.getCurrentRoom().getDescription());
         System.out.println("Type 'help' if you need help.");
         System.out.println();
     }
@@ -142,7 +143,7 @@ public class Game
         } else if (commandWord.equals("look")){
             System.out.print("You are in "+activePlayer.getCurrentRoom().getName()); //identify room
             System.out.println(", "+activePlayer.getCurrentRoom().getDescription());
-            System.out.println("\nYou see "+activePlayer.getCurrentRoom().listPlayers()+" in the room");
+            System.out.println("\nYou see "+activePlayer.getCurrentRoom().listOtherPlayers(activePlayer)+" in the room");
             System.out.println(activePlayer.getCurrentRoom().displayItems());
             System.out.println("\nYou can exit via "+activePlayer.getCurrentRoom().listExits());
             return true;
@@ -175,8 +176,8 @@ public class Game
      * @return true if the win condition has been reached
      */
     public boolean isOver(){
-        // return activePlayer.hasItemWithAttribute("victory_token");
-        return activePlayer.getCurrentRoom().hasItemWithAttribute("squeaks");
+        return activePlayer.hasItemWithAttribute("victory_token");
+        // return activePlayer.getCurrentRoom().hasItemWithAttribute("squeaks");
     }
 
     public World getWorld(){
@@ -201,7 +202,8 @@ public class Game
         Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
         Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
         Player Chii = new Player("Chii",12, mensRoom);
-        Item laptop = new Item("laptop","sleek mac",8,Chii);
+        Item laptop = new Item("laptop","sleek mac",8,plasmaLab);
+        laptop.addAttribute("victory_token");
         Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
         mouse1.addAttribute("squeaks");
         Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
