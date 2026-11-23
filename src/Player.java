@@ -29,6 +29,22 @@ public class Player extends Entity
     /**
      * Create a player with a certain name.
      * @param name the name of the player
+     * @param description a description of the player
+     * @param spawnpoint the room where the player starts
+     */
+    public Player (String name, String description, Room spawnpoint){
+        super(name,description);
+        this.currentRoom = spawnpoint;
+        roomHistory = new ArrayList<>();
+        likeness = "";
+        capacity = (double) 30;
+        currentRoom.spawnPlayer(this); //spawn the player in the room
+    }
+
+
+    /**
+     * Create a player with a certain name.
+     * @param name the name of the player
      */
     public Player (String name, double capacity, Room spawnpoint){
         super(name);
@@ -115,7 +131,12 @@ public class Player extends Entity
         } //ensure the rrom has been properly vacated
         entered = newRoom.addPlayer(this); //ensure the new room is properly entered
         logged = roomHistory.add(currentRoom); //add the room being left to the history
-        currentRoom = newRoom; //update the field
+        currentRoom = newRoom; //update the fieldsta
+        String debugString = "";
+        debugString += vacated ? "vacated" : "";
+        debugString += entered ? " enetered" : "";
+        debugString += logged ? " logged" : "";
+        System.out.println(debugString);
         return (vacated && entered && logged); //false if any fail
     }
     
@@ -129,6 +150,9 @@ public class Player extends Entity
             return false;
         }
         Room newRoom = currentRoom.takeExit(exitName);
+        if(newRoom == null){
+            return false;
+        }
         return goRoom(newRoom);
     }
     
@@ -143,8 +167,11 @@ public class Player extends Entity
         Item key = retrieveItem(keyName); // may be null
         if (key == null){
             return false;
-        }
-        return currentRoom.unlock(exitName, key);
+        } if (currentRoom.unlock(exitName,key)){
+            return true;
+        } // else actual item, but failed to unlock
+        acquireItem(key); //put it back in inventory
+        return false;
     }
     
    
@@ -156,20 +183,67 @@ public class Player extends Entity
         if (roomHistory.isEmpty()){
             return false;
         }
-        return goRoom(roomHistory.removeLast()); // essentially resets to the previous state 
+        // remove self
+        currentRoom.removePlayer(this);
+        // update room
+        currentRoom = roomHistory.removeLast();
+        // enter (add self)
+        currentRoom.addPlayer(this);
+        return true;
+        // return goRoom(roomHistory.removeLast()); // essentially resets to the previous state 
     }
 
     /**
      * Whether the player can add an item to inventory
      * 
-     * False if it's too heavy or it conflicts with an existing item
+     * False if items conflict
      * @param item the item to check
      * @return true if the player can acquire the item
      */
     @Override 
     public boolean canAcquire(Item item){ //could be item or null
-        return super.canAcquire(item) && item.getWeight()<=canCarry();
-    }
+        return (super.canAcquire(item) || currentRoom.canAcquire(item));
+    } //        inventory can acquire  OR  room can acquire             if I can't acquire it, I can still drop it into the room
+
+    /**
+     * Attempt to acquire item
+     * 
+     * If item is light enough and not a bad match, acquired normally.
+     * 
+     * If item is too heavy, drop it into room.
+     * 
+     * If item has a bad match, drop that match to room.
+     * 
+     * If room won't take it, transaction fails
+     * 
+     * 
+     * @param item the item to attempt to acquire
+     * @return true if a transaction is made
+     */
+    @Override
+    public boolean acquireItem(Item item){
+        if (item == null){
+            return false;
+        } else if (item.getWeight() > canCarry()){ // too heavy! drop it into the room
+            return currentRoom.acquireItem(item);
+        } else if (super.canAcquire(item)){ // not too heavy, no bad match with inventory
+            return super.acquireItem(item);
+        }  // we know that item is a bad match with something in the inventory. First test to see if we can drop that bad match into room
+        Item dropOut = retrieveBadMatch(item); // this item has been dropped out of the player's inventory.
+        // before proceeding, we ensure it's safe
+        if(dropOut == null || currentRoom.hasBadMatch(dropOut)){ //if there's going to be a problem actually dropping it into the room,
+            super.acquireItem(dropOut); // put the dropOut back in
+            return false; //didn't work
+        } //now that we know it's safe, drop dropOut into the room
+        currentRoom.acquireItem(dropOut);
+        // now that we know it's safe, we keep doing so until all bad matches are dropped into room
+        while(hasBadMatch(item)){ // for each badly matched item in inventory
+            dropOut = retrieveBadMatch(item);
+            currentRoom.acquireItem(dropOut);
+        } // and now that we no longer have a bad match
+        super.acquireItem(item);
+        return true;
+        }
     
     /**
      * Attempt to pick up an item from the current room
@@ -180,13 +254,32 @@ public class Player extends Entity
         Item item = currentRoom.retrieveItem(itemName); // is null or item
         if (item == null){
             return false; //nothing ever retrieved so it's fine
-        } else if (!canAcquire(item)){ //too heavy or bad match
+        }else if (acquireItem(item)){ //successfully acquired item
+            return true;
+        } else {   //was unsuccessful, must reabsorb into source
             currentRoom.acquireItem(item); //drop it back into the room
             return false;
-        } else { // light enough, and not a bad match
-            System.out.println("Player "+getName()+" now acquiring item\n"+item.getInfoString());
-            return acquireItem(item); // still safe if no key
         }
+    }
+
+    /**
+     * This will call the other pickUp a bunch of times
+     * @param itemName the name of the item you want to pick up
+     * @param count the nubmer of items you want to pick up
+     * @return the number of items you successfully picked up
+     */
+    public int pickUpCount(String itemName, int count){
+        boolean moved;
+        int moveCount = 0;
+        for (int i = 0; i < count; i++){
+            moved = pickUp(itemName);
+            if (moved){
+                moveCount ++;
+            } else {
+                break;
+            }
+        }
+        return moveCount;
     }
 
     /**
@@ -198,14 +291,35 @@ public class Player extends Entity
         Item item = retrieveItem(itemName); // handles all the bad cases
         if (item == null){ //no item to speak of
             return false;
-        } else if (!currentRoom.canAcquire(item)){ //I have the item but does it work for room
-            acquireItem(item); //pick it back up then
-            return false;
-        } else {
-            currentRoom.acquireItem(item); //room gets it
+        } else if (currentRoom.acquireItem(item)){ // if successful, put it in room
             return true;
+        } else { // otherwise,
+            acquireItem(item); //pick it back up 
+            return false;
         }
     }
+
+    /**
+     * setDown a certain number of items
+     * @param itemName the name of the item you want to set down
+     * @param count the nubmer of items you want to set down
+     * @return the number of items you successfully set down
+     */
+    public int setDownCount(String itemName, int count){
+        boolean moved;
+        int moveCount = 0;
+        for (int i = 0; i < count; i++){
+            moved = setDown(itemName);
+            if (moved){
+                moveCount ++;
+            } else {
+                break;
+            }
+        }
+        return moveCount;
+    }
+
+
 
     /**
      * The items in the players inventory
@@ -223,17 +337,41 @@ public class Player extends Entity
      */
     public boolean givePlayerItem(String playerName, String itemName){
         Player targetPlayer = currentRoom.getPlayer(playerName);
+        if (targetPlayer == null){
+            return false;
+        }
         Item item = retrieveItem(itemName);
-        if (targetPlayer == null || item == null){
+        if (item == null){
             return false;
-        } else if (!targetPlayer.canAcquire(item)){ // too heavy etc.
-            acquireItem(item); // take it back
+        } else if (targetPlayer.acquireItem(item)){
+            return true; // on success
+        } else { //it failed
+            acquireItem(item); //take it back
             return false;
-        } else {
-            targetPlayer.acquireItem(item);
-            return true;
         }
     }
+
+    /**
+     * give a player a number of items
+     * @param playerName the name of the player you're giving items to
+     * @param itemName the name of the item you want to give the player
+     * @param count the nubmer of items you want to give the player
+     * @return the number of items you successfully picked up
+     */
+    public int givePlayerItemCount(String playerName, String itemName, int count){
+        boolean moved;
+        int moveCount = 0;
+        for (int i = 0; i < count; i++){
+            moved = givePlayerItem(playerName, itemName);
+            if (moved){
+                moveCount ++;
+            } else {
+                break;
+            }
+        }
+        return moveCount;
+    }
+
 
     public boolean eat(String foodName){
         Item food;
@@ -265,4 +403,24 @@ public class Player extends Entity
         }
         return strOut;
     }
+
+    public String talkTo(String playerName){
+        Player targetPlayer = currentRoom.getPlayer(playerName);
+        if (targetPlayer instanceof NPC npc) { // check type and store as type!
+            return npc.getMonologue();
+        }
+        return null;
+        }
+
+    // public boolean buy(String merchantName, String productName, int amount, String currency){
+    //     Player targetPlayer = currentRoom.getPlayer(merchantName);
+    //     if (targetPlayer instanceof Merchant merchant) { // check type and store as type!
+    //         int amountGiven = givePlayerItemCount(merchantName, currency, amount);
+    //         Item product = merchant.retrieveItem(productName);
+            
+    //         return merchant.buyItem(productName, amount, );
+    //     }
+    //     return false;
+    //     }
+    // }
 }

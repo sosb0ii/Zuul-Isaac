@@ -89,6 +89,25 @@ public class Command
     public boolean hasArgs(){
         return !args.isEmpty();
     }
+
+    /**
+     * Returns the specified argument as a positive integer. defaults to default (usu 1)
+     * @param index the index to retrieve the argument from
+     * @param defaultNum the default if the argument is not a valid positive integer
+     * @return the argument as an integer, or the defualt
+     */
+    public int intArg(int index, int defaultNum){
+        String rawArg = getArg(index);
+        if (rawArg == null || rawArg.isBlank()){
+            return defaultNum;
+        } //now try to retrieve it as an int
+        try{
+            int argVal = Integer.parseInt(rawArg);
+            return argVal > 0 ? argVal : defaultNum; //finally using these
+        } catch (NumberFormatException a) {
+            return defaultNum;
+        }
+    }
     // /**
     //  * Create a command object. First and second word must be supplied, but
     //  * either one (or both) can be null.

@@ -220,10 +220,13 @@ public class Room extends Entity
     public String listExits(){
         // return String.join(", ",exits.keySet());
         if (exits.isEmpty()){
-            return "no exit";
+            return "the 'back' command"; // as in: you can exit via the 'back' command
         }
         ArrayList<Exit> exitList = new ArrayList<>(exits);
         String strOut = exitList.get(0).getName();
+        if (exitList.get(0).isLocked()){
+            strOut += " [locked]";
+        }
         for(int i=1;i<exitList.size();i++){
             if (exitList.size() != 2){ //avoid adding comma for list of 2
                 strOut += ", ";

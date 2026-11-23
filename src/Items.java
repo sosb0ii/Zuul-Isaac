@@ -55,7 +55,7 @@ public class Items
      * @return true if that item is found in the collection
      */
     public boolean contains(Item item){
-        return contents.containsKey(item);
+        return getCount(item) > 0;
     }
 
     /**
@@ -73,7 +73,7 @@ public class Items
             }
         }
         return 0;
-    }
+    }  
 
     public Item retrieve(String itemName){
         // check null or invalid
@@ -277,4 +277,39 @@ public class Items
         }
         return null;
     }
+
+    /**
+     * Retrieves an item that matches badly (same name, diff contents)
+     * with item.
+     * @param item the item to check against
+     * @return the badly matched item
+     */
+    public Item retrieveBadMatch(Item item){
+        if (item == null){
+            return null;
+        }
+        for (Item already: contents.keySet()){
+            if(already.isNamed(item.getName()) && !already.equals(item)) // bad match condition
+                return retrieve(already.getName()); //remove and return
+        }
+        return null;
+    }
+
+    /**
+     * Whether an item has a bad match within the collection
+     * (same name, different contents)
+     * @param item the item to check against
+     * @return true if such an item is found
+     */
+    public boolean hasBadMatch(Item item){
+        if (item == null){
+            return false;
+        }
+        for(Item already: contents.keySet()){
+            if(already.isNamed(item.getName()) && !already.equals(item)) // bad match condition
+                return true; //remove and return
+        }
+        return false;
+    }
+
 }

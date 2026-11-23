@@ -10,13 +10,15 @@ public class World
 {
     private HashMap<String, Room> rooms;
     private HashMap<String, Player> players;
+    private String name;
     
     /**
      * Create an empty world
      */
-    public World(){
+    public World(String name){
         rooms = new HashMap<>();
         players = new HashMap<>();
+        this.name = name;
     }
     
     /**
@@ -122,9 +124,9 @@ public class World
      * 
      * @param room1 Room 1
      * @param name1 The name of the exit from room 1's side
-     * @param key the attribute needed to unlock from room 1's side
      * @param room2 Room 2
      * @param name2 The name of the exit from room 2's side 
+     * @param key the attribute needed to unlock from either side
      * @return true if successful
      */
     public boolean stitchExits(Room room1, String name1, Room room2, String name2, String key){

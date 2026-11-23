@@ -40,30 +40,6 @@ public class Item
         }
 
     }
-    // /**
-    //  * Create the item by specifying its name, description, and weight
-    //  * 
-    //  * For example,
-    //  * name = "moneybag"
-    //  * description = "a pouch of coins"
-    //  * weight = 3.2
-    //  * 
-    //  * @param name the name of the item
-    //  * @param description the description of the item
-    //  * @param weight the weight of the item
-    //  * @param location the room to have the item
-    //  */
-    // public Item (String name, String description, double weight, Room location){
-    //     this.name = name;
-    //     this.description = description;
-    //     this.weight = weight;
-    //     this.attributes = new HashSet<>()
-    //     boolean added = location.acquireItem(this);
-    //     if (!added){ //if the item was not added to the player, it is not created
-    //         System.out.println("Unable to add "+name+"to room: "+location.getName());
-    //     }
-
-    // }
 
     //mainly for quick testing
     /**
@@ -78,37 +54,38 @@ public class Item
      * @param name the name of the item
      * @param owner the player to have the item
      */
-    public Item (String name, Player owner){
+    public Item (String name, Entity startingpoint){
         this.name = name;
         this.description = "";
         this.weight = 0;
-        boolean added = owner.acquireItem(this);
+        this.attributes = new HashSet<>();
+        boolean added = startingpoint.acquireItem(this);
         if (!added){
-            System.out.println("Unable to add "+name+" to player: "+owner.getName());
+            System.out.println("Unable to add "+name+" to: "+startingpoint.getName());
         }
     }
-    //mainly for quick testing
-    /**
-     * Create the item by specifying only its name.
-     * Description is "" and weight is 0 by default
-     * 
-     * For example,
-     * name = "moneybag"
-     * description = ""
-     * weight = 0
-     * 
-     * @param name the name of the item
-     * @param location the room to have the item
-     */
-    public Item (String name, Room location){
-        this.name = name;
-        this.description = "";
-        this.weight = 0;
-        boolean added = location.acquireItem(this);
-        if (!added){
-            System.out.println("Unable to add "+name+" to room: "+location.getName());
-        }
-    }
+    // //mainly for quick testing
+    // /**
+    //  * Create the item by specifying only its name.
+    //  * Description is "" and weight is 0 by default
+    //  * 
+    //  * For example,
+    //  * name = "moneybag"
+    //  * description = ""
+    //  * weight = 0
+    //  * 
+    //  * @param name the name of the item
+    //  * @param location the room to have the item
+    //  */
+    // public Item (String name, Room location){
+    //     this.name = name;
+    //     this.description = "";
+    //     this.weight = 0;
+    //     boolean added = location.acquireItem(this);
+    //     if (!added){
+    //         System.out.println("Unable to add "+name+" to room: "+location.getName());
+    //     }
+    // }
     
     /**
      * Return the item's info
@@ -162,26 +139,26 @@ public class Item
      */
     public boolean equals(Item other){
         if (!name.equals(other.getName())){ //diff name
-            System.out.println("different name");
+            // System.out.println("different name");
             return false;
         } else if (!description.equals(other.getDescription())){ //diff description
-            System.out.println("different description");
+            // System.out.println("different description");
             return false;
         } else if (weight != other.getWeight()){// diff weight
-            System.out.println("different weight");
+            // System.out.println("different weight");
             return false;
         } else if (attributeCount() != other.attributeCount()){// diff number of attributes
-            System.out.println("different attribute count");
+            // System.out.println("different attribute count");
             return false;
         } else{ // still need to check individual attributes
             for(String attribute: attributes){ // check one by one
                 if(!other.hasAttribute(attribute)){
-                    System.out.println("lacked attribute"+attribute);
+                    // System.out.println("lacked attribute"+attribute);
                     return false; //fale if not
                 }
             } // else all matched
         }
-        System.out.println("Both items match perfectly");
+        // System.out.println("Both items match perfectly");
         return true;
     }
     
@@ -199,6 +176,15 @@ public class Item
 
     public int attributeCount(){
         return attributes.size();
+    }
+
+    public double getValue(){
+        for(String attribute: attributes){
+            if(attribute.startsWith("worth") && attribute.endsWith("coin")){
+                return Double.parseDouble(attribute.substring(6,attribute.length()-5)) ;
+            }
+        }
+        return 0.0;
     }
     
 }

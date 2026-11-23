@@ -39,6 +39,17 @@ public abstract class Entity
     }
 
     /**
+     * Create `n` items like modelItem in entity
+     * @param modelItem the item for all created items to match
+     * @param n the number of items to add to the entity
+     */
+    public void createNitems(Item modelItem, int n){
+        for (int i=0; i<n; i++){
+            acquireItem(modelItem);
+        }
+    }
+
+    /**
      * @return the name of the entity
      */
     public String getName(){
@@ -51,6 +62,13 @@ public abstract class Entity
      */
     public String getDescription(){
         return description;
+    }
+
+    /**
+     * @param the description of the entity
+     */
+    public void setDescription(String description){
+        this.description = description;
     }
     
     /**
@@ -147,6 +165,29 @@ public abstract class Entity
         return items.getTotalWeight();
     }
 
+    /**
+     * Retrieves an item that matches badly (same name, diff contents)
+     * with item.
+     * @param item the item to check against
+     * @return the badly matched item
+     */
+    public Item retrieveBadMatch(Item item){
+        return items.retrieveBadMatch(item);
+    }
 
+        /**
+     * Whether an item has a bad match within the collection
+     * (same name, different contents)
+     * @param item the item to check against
+     * @return true if such an item is found
+     */
+    public boolean hasBadMatch(Item item){
+        return items.hasBadMatch(item);
+    }
+
+
+    public String toString(){
+        return getName();
+    }
 
 }
