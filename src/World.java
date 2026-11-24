@@ -11,6 +11,8 @@ public class World
     private HashMap<String, Room> rooms;
     private HashMap<String, Player> players;
     private String name;
+    private ArrayList<String> messages;
+    private String introduction;
     
     /**
      * Create an empty world
@@ -19,6 +21,18 @@ public class World
         rooms = new HashMap<>();
         players = new HashMap<>();
         this.name = name;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setIntroduction(String introduction){
+        this.introduction = introduction;
+    }
+
+    public String getIntroduction(){
+        return (introduction == null) ? "" : introduction;
     }
     
     /**
@@ -155,4 +169,24 @@ public class World
         return players.containsKey(playerName);
     }
     
+    public boolean winReached (Player Player){
+        return false;
+    }
+
+    public void queueMessage(String message){
+        messages.add(message);
+    }
+
+    public String getMessages(){
+        return String.join("\n",messages);
+    }
+
+    public void clearMessages(){
+        messages.clear();
+    }
+
+    public boolean hasMessages(){
+        return !messages.isEmpty();
+    }
+
 }

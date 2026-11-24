@@ -412,15 +412,30 @@ public class Player extends Entity
         return null;
         }
 
-    // public boolean buy(String merchantName, String productName, int amount, String currency){
-    //     Player targetPlayer = currentRoom.getPlayer(merchantName);
-    //     if (targetPlayer instanceof Merchant merchant) { // check type and store as type!
-    //         int amountGiven = givePlayerItemCount(merchantName, currency, amount);
-    //         Item product = merchant.retrieveItem(productName);
-            
-    //         return merchant.buyItem(productName, amount, );
-    //     }
-    //     return false;
-    //     }
-    // }
+    public boolean buy(String merchantName, String productName, int amount, String currencyName){
+        Player targetPlayer = currentRoom.getPlayer(merchantName);
+        if (targetPlayer == null || !(targetPlayer instanceof Merchant)){
+            say("there is no merchant "+merchantName);
+            return false; // no such player, or not Merchant
+        }
+        Merchant merchant = (Merchant) targetPlayer; // safe bc already checked must be a Merchant
+        //having verified the merchant, we now verify the currency item
+        Item currency;
+        boolean transferred = true;
+        for(int i=0; i < amount && transferred; i++){ //while loop checks the last transfer was successful
+            currency = retrieveItem(currencyName); //take out the currency
+            if (currency == null) break;
+            transferred = merchant.acquireCurrency(currency); // add to transaction balance
+        }
+        merchant.requestProduct(productName); // request product. merchant handles product & change transfer
+        return true;
+    }
+
+    public void say(String message){
+        currentRoom.tellTheWorld(message);
+    }
+
+    public void sayI(String message){
+        currentRoom.tellTheWorld(getName()+": "+message);
+    }
 }

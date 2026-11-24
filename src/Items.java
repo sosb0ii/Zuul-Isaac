@@ -89,6 +89,18 @@ public class Items
 
     }
 
+    /**
+     * retrieve an arbitrary item from inside.
+     * @return some item from the collection, or null
+     */
+    public Item retrieveAny(){
+        if (isEmpty()) return null;
+        Item item = contents.keySet().iterator().next();
+        subtractOne(item);
+        return item;
+    }
+
+
     public boolean canAcquire(Item item){
         if (item == null || item.getName() == null || item.isNamed("")){ //illegal conditions
             return false;
@@ -310,6 +322,14 @@ public class Items
                 return true; //remove and return
         }
         return false;
+    }
+
+    public double getNetWorth(){
+        double netWorth = 0.0;
+        for(Map.Entry<Item,Integer> itemCount: contents.entrySet()){
+            netWorth += itemCount.getKey().getWorth() * itemCount.getValue(); //item.worth*count
+        }
+        return netWorth;
     }
 
 }

@@ -178,10 +178,27 @@ public class Item
         return attributes.size();
     }
 
-    public double getValue(){
+    /**
+     * the worth of a currency item, such as a coin
+     * @return its worth in gold
+     */
+    public double getWorth(){
         for(String attribute: attributes){
-            if(attribute.startsWith("worth") && attribute.endsWith("coin")){
-                return Double.parseDouble(attribute.substring(6,attribute.length()-5)) ;
+            if(attribute.startsWith("worth ") && attribute.endsWith(" gp")){
+                return Double.parseDouble(attribute.substring(6,attribute.length()-3)) ;
+            }
+        }
+        return 0.0;
+    }
+
+    /**
+     * the cost of an item, such as a product
+     * @return its cost in gold
+     */
+    public double getCost(){
+        for(String attribute: attributes){
+            if(attribute.startsWith("costs ") && attribute.endsWith(" gp")){
+                return Double.parseDouble(attribute.substring(6,attribute.length()-3)) ;
             }
         }
         return 0.0;

@@ -274,4 +274,8 @@ public class Room extends Entity
         boolean spawned = addPlayer(newPlayer);
         return (registered && spawned);
     }
+
+    public void tellTheWorld(String message){
+        theWorld.queueMessage(message);
+    }
 }

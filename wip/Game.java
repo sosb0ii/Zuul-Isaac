@@ -92,6 +92,8 @@ public class Game
                 System.out.println();
                 continue; // tries again
             }
+            System.out.println(world.getMessages());
+            world.clearMessages();
             if (success){
                 System.out.println(successMessage(command));
             } else{ //custom fail message
@@ -293,7 +295,7 @@ public class Game
         Room street = new Room("street", "cobbled and puddly", scamWorld);
         Room market = new Room("market", "for the buying and for the selling", scamWorld);
         Merchant merchant = new Merchant("merchant", "fat and rich", market,"");
-        Player p1 = new Player("Charlie", "the Charlatan", attic);
+        Player p1 = new Player("Larson", "the Larcenist", attic);
         Item atticKey = new Item("key", "a rusty key",.1, crawlspace);
         atticKey.addAttribute("probably tetanus");
         Item chestKey = new Item("key", "a tarnished silver skeleton key", .1,attic);
