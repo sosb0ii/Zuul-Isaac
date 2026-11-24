@@ -1,4 +1,5 @@
 import java.io.File;
+import java.nio.file.Path;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
@@ -24,6 +25,7 @@ public class Parser
     private CommandWords commands;  // holds all valid command words
     private Scanner reader;         // source of command input
     private boolean isFileInput = false; //only true if reading from file
+    public static final String scriptFolder = "run-throughs";
 
     /**
      * Create a parser to read from the terminal window.
@@ -39,8 +41,9 @@ public class Parser
      */
     public Parser(String filename) {
         commands = new CommandWords();
-        try { 
-            reader = new Scanner(new File(filename));
+        Path filePath = Path.of(scriptFolder,filename);
+        try {
+            reader = new Scanner(filePath.toFile());
         } catch (FileNotFoundException e) {
             System.out.println("Cannot find the file "+filename);
             System.out.println("Reverting to use the command line for input.");
