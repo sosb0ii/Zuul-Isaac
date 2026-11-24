@@ -1,3 +1,11 @@
+/**
+ * 
+ * Merchant is an NPC that sells you stuff.
+ * Some of the implementation (requestProduct) is clunky,
+ * because it would fit better in a Shop subclass of Room.
+ * But this works alright.
+ */
+
 public class Merchant extends NPC
 {
 
@@ -84,6 +92,10 @@ public class Merchant extends NPC
         }
     }
 
+    @Override 
+    public String getMonologue(){
+        return "Hey there! What're you looking to buy?\nI've got\n"+forSale.list();
+    }
 
 
     public void clearTheCounter(){ //counter is the "transaction"

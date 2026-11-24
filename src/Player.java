@@ -222,12 +222,15 @@ public class Player extends Entity
      */
     @Override
     public boolean acquireItem(Item item){
-        if (item == null){
+        if (item == null)return false;
+        else if (item.getWeight() > canCarry()){ // too heavy! drop it into the room
+            currentRoom.acquireItem(item);
+            say(getName()+" dropped "+item.getName()+" because it was too heavy");
+            say(item.getDescription());
             return false;
-        } else if (item.getWeight() > canCarry()){ // too heavy! drop it into the room
-            return currentRoom.acquireItem(item);
-        } else if (super.canAcquire(item)){ // not too heavy, no bad match with inventory
-            return super.acquireItem(item);
+        } else if (super.acquireItem(item)){ // not too heavy, no bad match with inventory
+            // THIS part is regular, successful acquisition!
+            return true;
         }  // we know that item is a bad match with something in the inventory. First test to see if we can drop that bad match into room
         Item dropOut = retrieveBadMatch(item); // this item has been dropped out of the player's inventory.
         // before proceeding, we ensure it's safe
@@ -236,6 +239,8 @@ public class Player extends Entity
             return false; //didn't work
         } //now that we know it's safe, drop dropOut into the room
         currentRoom.acquireItem(dropOut);
+        say(getName()+" dropped "+dropOut.getName()+" on accident");
+        say(dropOut.getDescription());
         // now that we know it's safe, we keep doing so until all bad matches are dropped into room
         while(hasBadMatch(item)){ // for each badly matched item in inventory
             dropOut = retrieveBadMatch(item);
@@ -419,6 +424,9 @@ public class Player extends Entity
             return false; // no such player, or not Merchant
         }
         Merchant merchant = (Merchant) targetPlayer; // safe bc already checked must be a Merchant
+        if (productName.equals("change")){ //player is just asking for change!
+            merchant.requestProduct(productName);
+        }
         //having verified the merchant, we now verify the currency item
         Item currency;
         boolean transferred = true;
@@ -426,9 +434,10 @@ public class Player extends Entity
             currency = retrieveItem(currencyName); //take out the currency
             if (currency == null) break;
             transferred = merchant.acquireCurrency(currency); // add to transaction balance
+            if (!transferred) acquireItem(currency); //pick it back up if transfer failed
         }
-        merchant.requestProduct(productName); // request product. merchant handles product & change transfer
-        return true;
+        Item product = merchant.requestProduct(productName); // request product. merchant handles product & change 
+        return acquireItem(product);
     }
 
     public void say(String message){
