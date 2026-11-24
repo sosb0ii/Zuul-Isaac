@@ -100,7 +100,6 @@ public class Items
         return item;
     }
 
-
     public boolean canAcquire(Item item){
         if (item == null || item.getName() == null || item.isNamed("")){ //illegal conditions
             return false;
@@ -324,6 +323,12 @@ public class Items
         return false;
     }
 
+    /**
+     * get the total worth of all items in the collection
+     * items will have attribute [worth XX gp]
+     * 
+     * @return the total worth in gp of all items in collection
+     */
     public double getNetWorth(){
         double netWorth = 0.0;
         for(Map.Entry<Item,Integer> itemCount: contents.entrySet()){

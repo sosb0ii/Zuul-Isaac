@@ -192,6 +192,19 @@ public class Item
     }
 
     /**
+     * set the worth of a currency item, such as a coin
+     * @param worth its worth in gold
+     */
+    public void setWorth(double worth){
+        for(String attribute: attributes){ // first clear any worth already assigned
+            if(attribute.startsWith("worth ") && attribute.endsWith(" gp")){
+                attributes.remove(attribute);
+            }
+        }
+        addAttribute("worth "+String.valueOf(worth)+" gp");
+    }
+
+    /**
      * the cost of an item, such as a product
      * @return its cost in gold
      */
@@ -202,6 +215,19 @@ public class Item
             }
         }
         return 0.0;
+    }
+
+    /**
+     * set the cost of a currency item, such as a coin
+     * @param cost its worth in gold
+     */
+    public void setCost(double cost){
+        for(String attribute: attributes){ // first clear any worth already assigned
+            if(attribute.startsWith("costs ") && attribute.endsWith(" gp")){
+                attributes.remove(attribute);
+            }
+        }
+        addAttribute("costs "+String.valueOf(cost)+" gp");
     }
     
 }

@@ -185,6 +185,10 @@ public abstract class Entity
         return items.hasBadMatch(item);
     }
 
+    public double getNetWorth(){
+        return items.getNetWorth();
+    }
+
 
     public String toString(){
         return getName();
