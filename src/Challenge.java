@@ -16,6 +16,7 @@ public class Challenge {
     public static Player Chii = new Player("Chii",12, mensRoom);
     public static Player Nik = new Player("Niklas", vanZ);
     public static Item laptop = new Item("laptop","sleek mac",8,Nik);
+    public static Item laptop = new Item("laptop","sleek mac",8,Chii);
     public static Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
     public static Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
     public static Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
