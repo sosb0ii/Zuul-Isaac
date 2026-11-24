@@ -80,7 +80,7 @@ public class Merchant extends NPC
             double gained = 0;
             Item charge;
             int attempts = 0; // in case something goes wrong with what the merchant can't pick up (obscure free money glitch??)
-            System.out.println("about to loop pickups");
+            // System.out.println("about to loop pickups");
             while(gained < product.getCost() && attempts < 10000){ //keep picking up money (at random) until satisfied
                 charge = transaction.retrieveAny(); // grab something from the counter
                 if(!acquireItem(charge)){ //pocket the item. if you can't,
@@ -91,7 +91,7 @@ public class Merchant extends NPC
                 }
                 attempts ++;
             } //enough money given & merchant has had their attempt to pick it up (99.9% successful, just edge case fails)
-            System.out.println("transaction all but done");
+            // System.out.println("transaction all but done");
             if (gained < product.getCost()){ // merchant can't pick up all the money for some reason
                 sayI("You sly dog, you tricked me!"); // If you manage this then I'll let you take the product anyway
             } else {
