@@ -1,22 +1,39 @@
+help
+help go
 go dark-hole
+help
+look
+help take
 take key
 go the-light
+look
+help unlock
 unlock floor-door key
 go floor-door
+look
 go narrow-oak-doors
+look
 take coin 16
 back
+look
 go doorway
+look
 go front-door
+look
 go pavement
-give Gilmore coin 19
+look
+talk Gilmore
+help buy
+buy magic-cookie coin 16
+give Gilmore coin 16
 look
 inventory
 take coin 300
-look
+inventory
 buy magic-cookie coin 20
-look
 buy change
 inventory
+help eat
+eat magic-cookie
 look
-take coin 1000
+take coin 271
