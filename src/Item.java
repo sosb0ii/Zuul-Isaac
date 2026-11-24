@@ -94,9 +94,9 @@ public class Item
      * moneybag (3.2 lbs): A pouch of coins
      */
     public String getInfoString(){
-        String strOut = name+" ("+weight+" lbs): " +description;
+        String strOut = name+" ("+Player.prettyDouble(weight)+" lbs): " +description;
         if (!attributes.isEmpty()){
-            strOut += "\n[" + String.join(", ",attributes)+"]";
+            strOut += "\n\t[" + String.join(", ",attributes)+"]";
         }
         return strOut;
     }
@@ -184,8 +184,8 @@ public class Item
      */
     public double getWorth(){
         for(String attribute: attributes){
-            if(attribute.startsWith("worth ") && attribute.endsWith(" gp")){
-                return Double.parseDouble(attribute.substring(6,attribute.length()-3)) ;
+            if(attribute.startsWith("worth ") && attribute.endsWith(" gold")){
+                return Double.parseDouble(attribute.substring(6,attribute.length()-5)) ;
             }
         }
         return 0.0;
@@ -197,11 +197,11 @@ public class Item
      */
     public void setWorth(double worth){
         for(String attribute: attributes){ // first clear any worth already assigned
-            if(attribute.startsWith("worth ") && attribute.endsWith(" gp")){
+            if(attribute.startsWith("worth ") && attribute.endsWith(" gold")){
                 attributes.remove(attribute);
             }
         }
-        addAttribute("worth "+String.valueOf(worth)+" gp");
+        addAttribute("worth "+String.valueOf(worth)+" gold");
     }
 
     /**
@@ -210,24 +210,24 @@ public class Item
      */
     public double getCost(){
         for(String attribute: attributes){
-            if(attribute.startsWith("costs ") && attribute.endsWith(" gp")){
-                return Double.parseDouble(attribute.substring(6,attribute.length()-3)) ;
+            if(attribute.startsWith("costs ") && attribute.endsWith(" gold")){
+                return Double.parseDouble(attribute.substring(6,attribute.length()-5)) ;
             }
         }
         return 0.0;
     }
 
     /**
-     * set the cost of a currency item, such as a coin
-     * @param cost its worth in gold
+     * set the cost of an item, like a product
+     * @param cost its cost in gold
      */
     public void setCost(double cost){
         for(String attribute: attributes){ // first clear any worth already assigned
-            if(attribute.startsWith("costs ") && attribute.endsWith(" gp")){
+            if(attribute.startsWith("costs ") && attribute.endsWith(" gold")){
                 attributes.remove(attribute);
             }
         }
-        addAttribute("costs "+String.valueOf(cost)+" gp");
+        addAttribute("costs "+String.valueOf(cost)+" gold");
     }
     
 }

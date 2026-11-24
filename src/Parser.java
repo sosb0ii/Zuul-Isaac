@@ -41,7 +41,7 @@ public class Parser
      */
     public Parser(String filename) {
         commands = new CommandWords();
-        Path filePath = Path.of(scriptFolder,filename);
+        Path filePath = Path.of(scriptFolder,filename+".txt");
         try {
             reader = new Scanner(filePath.toFile());
         } catch (FileNotFoundException e) {
@@ -69,6 +69,11 @@ public class Parser
      */
     public Command getCommand() 
     {
+        if (usingFile() && !reader.hasNextLine()){ //catch after the last input, if game still running
+            isFileInput = false; //allow play to continue from terminal
+            System.out.println("Switching to typed input!");
+            reader = new Scanner(System.in);
+        }
         String inputLine;   // will hold the full input line
         System.out.print("> ");     // print prompt
 
@@ -78,6 +83,15 @@ public class Parser
         }
         return new Command(inputLine);
     }
+
+    /**
+     * next line as string
+     * @return next line as string
+     */
+    public String getInput(){
+        return reader.nextLine().trim();
+    }
+
 
     /**
      * Print out a list of valid command words.

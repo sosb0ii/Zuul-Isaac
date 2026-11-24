@@ -21,69 +21,68 @@ public class Game
     private Parser parser;
     private World world;
     private Player activePlayer;
-    // private boolean quitGame;
     private boolean keepPlaying;
-    //private Room currentRoom;
-    //private ArrayList<Room> roomHistory;
-    //private HashMap<Item, Room> itemRegistry; //in case you need to know where a specified item is
-    //private HashMap<Player, Room> characterLocations; //in case you need to know where a specified player is
-    //private HashSet<String, Player> playerRoster; //ensure players do not have the same name; or just check the characterLocations HashMap??
-    //private Room defaultRoom;
     
     /**
      * Create the game by loading the default world and initialise its internal map.
      */
     public Game() 
     {
-        // world = World.default();
         parser = new Parser();
     }
+    /**
+     * The main method that sets up and plays the game
+     */
+    public void main(){
+        Game game = new Game();
+        System.out.println("Welcome to Isaac's Zuul Game!");
+        game.worldMenu();
+        game.playerMenu();
+        game.play(); //when this finishes, play has ended.
+        System.out.println("Thank you for playing.  Good bye.");
+    }
 
-    // /**
-    //  * Create all the rooms and link their exits together.
-    //  */
-    // private void createRooms()
-    // {
-    //     Room outside, theater, pub, lab, office;
-      
-    //     // create the rooms
-    //     outside = new Room("outside the main entrance of the university");
-    //     theater = new Room("in a lecture theater");
-    //     pub = new Room("in the campus pub");
-    //     lab = new Room("in a computing lab");
-    //     office = new Room("in the computing admin office");
-        
-    //     // initialise room exits
-    //     outside.setExit("east", theater);
-    //     outside.setExit("south", lab);
-    //     outside.setExit("west", pub);
+    /**
+     * Choose the world to play
+     */
+    public void worldMenu(){
+        System.out.println("This game allows you to build and play multiple worlds.\nChoose one from below to play:");
+        String worldName = prompt(World.listPresetWorlds()); //uses parser
+        while (!World.hasPreset(worldName)){ // not a valid entry
+            worldName = prompt("not a valid preset world.");
+        }
+        setWorld(World.fromPreset(worldName));
+        world.clearMessages(); // avoid overloading with world construction details
+    }
 
-    //     theater.setExit("west", outside);
-
-    //     pub.setExit("east", outside);
-
-    //     lab.setExit("north", outside);
-    //     lab.setExit("east", office);
-
-    //     office.setExit("west", lab);
-
-    //     currentRoom = outside;  // start game outside
-    // }
+    /**
+     * Choose the player, I guess. 1p game doesn't do much
+     */
+    public void playerMenu(){
+	if (world.getNumPlayables() > 1){
+	    //implement later
+	} else {
+	    setActivePlayer(world.getMainCharacter());   
+	}
+	    System.out.println("You are "+activePlayer.getName()+", "+activePlayer.getDescription());
+    }
 
     /**
      *  Main play routine.  Loops until end of play.
      */
     public void play() 
     {            
-        printWelcome();
-
+        String response = prompt("auto-play from run-through? yes or no");
+        if (response.toLowerCase().startsWith("y")){
+            autoPlay(world.getName());
+        }
         // Enter the main command loop.  Here we repeatedly read commands and
         // execute them until the game is over.
-                
         boolean success;
         keepPlaying = true;
         while (keepPlaying) {
             Command command = parser.getCommand();
+            if (parser.usingFile()) System.out.println(command);
             if (command.isValid()){
                 success = processCommand(command);
             } else {
@@ -92,34 +91,18 @@ public class Game
                 System.out.println();
                 continue; // tries again
             }
-            System.out.println(world.getMessages());
+            if (world.hasMessages()) System.out.println(world.getMessages());
             world.clearMessages();
             if (success){
-                System.out.println(successMessage(command));
+                printSuccess(command);
             } else{ //custom fail message
                 System.out.println(failMessage(command));
             }
-            if(isOver()){ //world's victory condition reached
+            if(world.winReached(activePlayer)){ //world's victory condition reached
                 System.out.println("You have completed the game! Congratulations!");
                 keepPlaying = false;
             }
-            System.out.println(); //feels nicer when there's a space
         } // ends when keepPlaying is false. quit or win.
-        System.out.println("Thank you for playing.  Good bye.");
-    }
-
-    /**
-     * Print out the opening message for the player.
-     */
-    private void printWelcome()
-    {
-        System.out.println();
-        System.out.println("Welcome to the World of Zuul!");
-        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
-        System.out.print("You are in "+activePlayer.getCurrentRoom().getName());
-        System.out.println(", "+activePlayer.getCurrentRoom().getDescription());
-        System.out.println("Type 'help' if you need help.");
-        System.out.println();
     }
 
     /**
@@ -154,7 +137,7 @@ public class Game
             System.out.println(", "+activePlayer.getCurrentRoom().getDescription());
             System.out.println("\nYou see "+activePlayer.getCurrentRoom().listOtherPlayers(activePlayer)+" in the room");
             System.out.println("\n"+activePlayer.getCurrentRoom().displayItems());
-            System.out.println("\nYou can exit via "+activePlayer.getCurrentRoom().listExits());
+            System.out.println("\nYou can go through "+activePlayer.getCurrentRoom().listExits());
             return true;
         } else if (commandWord.equals("inventory")){
             System.out.println(activePlayer.displayItems());
@@ -194,6 +177,9 @@ public class Game
                 return true;
             }
             System.out.println(command.getArg(0)+":\n"+message);
+            return true;
+        } else if (commandWord.equals("buy")){
+            return activePlayer.buy(command.getArg(0),command.getArg(1),command.intArg(2,1));
         }
         
         
@@ -250,81 +236,81 @@ public class Game
         return activePlayer;
     }
 
-    //testing the setup. REMOVE LATER!!
-    public static void main(String[] args) {
-        // // create world
-        // World cheeseWorld = new World("Chii's_World");
-        // // create rooms
-        // Room plasmaLab = new Room("Plasma_Lab","So much fun!", cheeseWorld);
-        // Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
-        // Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
-        // Room vanZ = new Room("VanZoeren","a veritable maze",cheeseWorld);
-        // // create players
-        // Player Chii = new Player("Chii",12, mensRoom);
-        // Player Nik = new Player("Niklas", vanZ);
-        // // create items
-        // Item laptop = new Item("laptop","sleek mac",8,Nik);
-        // // laptop.addAttribute("victory_token");
-        // Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
-        // mouse1.addAttribute("squeaks");
-        // Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
-        // mouse2.addAttribute("clicks");
-        // Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
-        // mouse3.addAttribute("squeaks");
-        // // connect exits
-        // mensRoom.addExit("bath-exit", vanderHall);
-        // vanderHall.addExit("push_door", mensRoom);
-        // vanderHall.addExit("hall-door", plasmaLab);
-        // plasmaLab.addExit("lab-exit", vanderHall);
-        // // new way of connecting exits
-        // cheeseWorld.stitchExits(vanderHall,"hallway-east", vanZ,"hallway-west");
-        // //generate game, set world & active player
-        // Game game = new Game();
-        // game.setWorld(cheeseWorld);
-        // game.setActivePlayer(Chii);
-        // System.out.println(game.getActivePlayer().getName()+" is in "+Chii.getCurrentRoom().getName());
-        // System.out.println("Challenge: get a squeaker into the plasma lab");
-        // game.play();
-        World scamWorld = new World("Huckster's_Paradise");
-        Room attic = new Room("attic", "stuffy and dusty", scamWorld);
-        Room crawlspace = new Room("crawlspace", "a dark, cramped hole of spiderwebs", scamWorld);
-        Room bedroom = new Room("bedroom", "not sure whose", scamWorld);
-        Room closet = new Room("closet", "full of clothes", scamWorld);
-        Room kitchen = new Room("kitchen", "aromatic and cramped",scamWorld);
-        Room bathroom = new Room("bathroom", "stinky and cramped", scamWorld);
-        Room street = new Room("street", "cobbled and puddly", scamWorld);
-        Room market = new Room("market", "for the buying and for the selling", scamWorld);
-        Merchant merchant = new Merchant("merchant", "fat and rich", market,"");
-        Player p1 = new Player("Larson", "the Larcenist", attic);
-        Item atticKey = new Item("key", "a rusty key",.1, crawlspace);
-        atticKey.addAttribute("probably tetanus");
-        Item chestKey = new Item("key", "a tarnished silver skeleton key", .1,attic);
-        chestKey.addAttribute("looks valuable");
-        Item gateKey = new Item("key", "a hefty steel key", .1, p1);
-        chestKey.addAttribute("might need that later");
-        Item goldCoin = new Item("coin","made of gold",1,merchant);
-        Item brassCoin = new Item("coin","made of brass",.2,closet);
-        Item cookie = new Item("cookie",merchant);
-        scamWorld.stitchExits(attic,"floor-door","probably tetanus",bedroom,"ceiling-stairs");
-        scamWorld.stitchExits(attic, "dark-hole", crawlspace, "the-light");
-        scamWorld.stitchExits(bedroom, "narrow-oak-doors", closet, "back");
-        scamWorld.stitchExits(bedroom, "curtain", bathroom, "curtain");
-        scamWorld.stitchExits(bedroom, "doorway", kitchen, "doorway");
-        scamWorld.stitchExits(kitchen, "front-door", street, "front-door");
-        scamWorld.stitchExits(street, "pavement", market, "pavement");
-        cookie.addAttribute("worth 100 coin");
-        cookie.addAttribute("edible");
-        brassCoin.addAttribute("worth 0.1 coin");
-        goldCoin.addAttribute("worth 1 coin");
-        merchant.setCapacity(200);
-        merchant.setMonologue("Welcome to my shop!\nToday I'm selling a magic cookie for 1 gold coin!");
-        merchant.createNitems(goldCoin, 99);
-        Game game = new Game();
-        game.setWorld(scamWorld);
-        game.setActivePlayer(p1);
-        game.play();
+    // //testing the setup. REMOVE LATER!!
+    // public static void main(String[] args) {
+    //     // // create world
+    //     // World cheeseWorld = new World("Chii's_World");
+    //     // // create rooms
+    //     // Room plasmaLab = new Room("Plasma_Lab","So much fun!", cheeseWorld);
+    //     // Room vanderHall = new Room("Vanderwerf_Hallway","straight and long", cheeseWorld);
+    //     // Room mensRoom = new Room("Mens_Room","A place of business", cheeseWorld);
+    //     // Room vanZ = new Room("VanZoeren","a veritable maze",cheeseWorld);
+    //     // // create players
+    //     // Player Chii = new Player("Chii",12, mensRoom);
+    //     // Player Nik = new Player("Niklas", vanZ);
+    //     // // create items
+    //     // Item laptop = new Item("laptop","sleek mac",8,Nik);
+    //     // // laptop.addAttribute("victory_token");
+    //     // Item mouse1 = new Item("mouse","goes squeak",2,mensRoom);
+    //     // mouse1.addAttribute("squeaks");
+    //     // Item mouse2 = new Item("mouse","goes click",1,plasmaLab);
+    //     // mouse2.addAttribute("clicks");
+    //     // Item mouse3 = new Item("mouse","goes squeak", 2, vanderHall);
+    //     // mouse3.addAttribute("squeaks");
+    //     // // connect exits
+    //     // mensRoom.addExit("bath-exit", vanderHall);
+    //     // vanderHall.addExit("push_door", mensRoom);
+    //     // vanderHall.addExit("hall-door", plasmaLab);
+    //     // plasmaLab.addExit("lab-exit", vanderHall);
+    //     // // new way of connecting exits
+    //     // cheeseWorld.stitchExits(vanderHall,"hallway-east", vanZ,"hallway-west");
+    //     // //generate game, set world & active player
+    //     // Game game = new Game();
+    //     // game.setWorld(cheeseWorld);
+    //     // game.setActivePlayer(Chii);
+    //     // System.out.println(game.getActivePlayer().getName()+" is in "+Chii.getCurrentRoom().getName());
+    //     // System.out.println("Challenge: get a squeaker into the plasma lab");
+    //     // game.play();
+    //     World scamWorld = new World("Huckster's_Paradise");
+    //     Room attic = new Room("attic", "stuffy and dusty", scamWorld);
+    //     Room crawlspace = new Room("crawlspace", "a dark, cramped hole of spiderwebs", scamWorld);
+    //     Room bedroom = new Room("bedroom", "not sure whose", scamWorld);
+    //     Room closet = new Room("closet", "full of clothes", scamWorld);
+    //     Room kitchen = new Room("kitchen", "aromatic and cramped",scamWorld);
+    //     Room bathroom = new Room("bathroom", "stinky and cramped", scamWorld);
+    //     Room street = new Room("street", "cobbled and puddly", scamWorld);
+    //     Room market = new Room("market", "for the buying and for the selling", scamWorld);
+    //     Merchant merchant = new Merchant("merchant", "fat and rich", market,"");
+    //     Player p1 = new Player("Larson", "the Larcenist", attic);
+    //     Item atticKey = new Item("key", "a rusty key",.1, crawlspace);
+    //     atticKey.addAttribute("probably tetanus");
+    //     Item chestKey = new Item("key", "a tarnished silver skeleton key", .1,attic);
+    //     chestKey.addAttribute("looks valuable");
+    //     Item gateKey = new Item("key", "a hefty steel key", .1, p1);
+    //     chestKey.addAttribute("might need that later");
+    //     Item goldCoin = new Item("coin","made of gold",1,merchant);
+    //     Item brassCoin = new Item("coin","made of brass",.2,closet);
+    //     Item cookie = new Item("cookie",merchant);
+    //     scamWorld.stitchExits(attic,"floor-door","probably tetanus",bedroom,"ceiling-stairs");
+    //     scamWorld.stitchExits(attic, "dark-hole", crawlspace, "the-light");
+    //     scamWorld.stitchExits(bedroom, "narrow-oak-doors", closet, "back");
+    //     scamWorld.stitchExits(bedroom, "curtain", bathroom, "curtain");
+    //     scamWorld.stitchExits(bedroom, "doorway", kitchen, "doorway");
+    //     scamWorld.stitchExits(kitchen, "front-door", street, "front-door");
+    //     scamWorld.stitchExits(street, "pavement", market, "pavement");
+    //     cookie.addAttribute("worth 100 coin");
+    //     cookie.addAttribute("edible");
+    //     brassCoin.addAttribute("worth 0.1 coin");
+    //     goldCoin.addAttribute("worth 1 coin");
+    //     merchant.setCapacity(200);
+    //     merchant.setMonologue("Welcome to my shop!\nToday I'm selling a magic cookie for 1 gold coin!");
+    //     merchant.createNitems(goldCoin, 99);
+    //     Game game = new Game();
+    //     game.setWorld(scamWorld);
+    //     game.setActivePlayer(p1);
+    //     game.play();
 
-    }
+    // }
 
 
     /** 
@@ -360,7 +346,6 @@ public class Game
      */
     public void autoPlay(String filename){
         parser = new Parser(filename);
-        play();
     }
 
     /**
@@ -369,18 +354,14 @@ public class Game
      * @param command the command to give feedback for
      * @return a string validating the success of the command
      */
-    public String successMessage(Command command){
+    public void printSuccess(Command command){
         String strOut = "";
-        ArrayList<String> noMsgCmds = new ArrayList<>(List.of("help","look","clear","inventory","whoami","talk"));
-        if (noMsgCmds.contains(command.getCommandWord())){ // no extra feedback needed for some commands
-            strOut = "";
-        } else if (command.is("go")){
+        if (command.is("go")){
             strOut = command.getArg(0) +" took you to " + getActivePlayer().getCurrentRoom().getName();
         } else if (command.is("switch")){
             strOut = "you are now playing as "+getActivePlayer().getName();
         } else if (command.is("take")){
-            strOut = "you took "+command.getArg(0)+"(s) from "+getActivePlayer().getCurrentRoom().getName();
-            strOut += "\ncheck your inventory";
+            strOut = command.getArg(0)+" added to inventory";
         } else if (command.is("drop")){
             strOut = "you dropped "+command.getArg(0)+"(s) in "+getActivePlayer().getCurrentRoom().getName();
             strOut += "\nlook at your surroundings";
@@ -392,9 +373,10 @@ public class Game
         }else if (command.is("unlock")){
             strOut = "unlocked "+command.getArg(0)+" with "+command.getArg(1);
         }  else {
-            strOut = "'"+command+"' was successful"; //toString() copies inputLine
+            strOut = ""; //toString() copies inputLine
         }
-        return strOut;
+        
+        if (!strOut.isBlank()) System.out.println(strOut);
     }
 
     /**
@@ -482,7 +464,15 @@ public class Game
             explain = "try to talk to an NPC in the room";
             tip = "use 'look' to see available NPC's";
             parameters.add("NPC");
-            example = "talk merchant";
+            example = "talk passerby";
+        } else if (commandName.equals("buy")){
+            explain = "pay <amount> of <item> to try to buy <product> from a merchant in the room\nor get change from a merchant";
+            tip = "use 'look' to see NPC-merchants";
+            tip += "use 'buy change' to get change back";
+            parameters.add("product");
+            parameters.add("item");
+            parameters.add("amount");
+            example = "buy sword gemstone 3";
         } else {
             tip = "use common sense";
         }
@@ -510,7 +500,15 @@ public class Game
         return strOut.trim();
     }
 
-    
+    /**
+     * prompt response with text
+     * @param prompt the prompt to show the reader
+     * @return the next line as string
+     */
+    public String prompt(String prompt){
+        System.out.println(prompt);
+        return parser.getInput();
+    }
     
 }
 

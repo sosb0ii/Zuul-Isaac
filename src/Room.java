@@ -98,15 +98,23 @@ public class Room extends Entity
         if (otherPlayers.isEmpty()){
             return "nobody";
         }
-        String strOut = otherPlayers.get(0).getName();
-        for(int i=1;i<otherPlayers.size();i++){
-            if (otherPlayers.size() != 2){ //avoid adding comma for list of 2
+        String strOut = "";
+        for(int i=0;i<otherPlayers.size();i++){
+            Player player = players.get(i);
+            if (otherPlayers.size() != 2 && i!= 0){ //avoid adding comma for list of 2
                 strOut += ", ";
             }
-            if (i == otherPlayers.size()-1){
+            if (i == players.size()-1){
                 strOut += " and ";
             }
-            strOut += otherPlayers.get(i).getName();
+            strOut += player.getName();
+            if (player instanceof NPC){
+                NPC npc = (NPC) player;
+                strOut += npc.getNPCid();
+                // tellTheWorld(player.getName() +" is an NPC");
+            } else{
+                // tellTheWorld(player.getName() +" is not an NPC");
+            }
         }
         return strOut;
     }
@@ -121,13 +129,18 @@ public class Room extends Entity
         }
         String strOut = players.get(0).getName();
         for(int i=1;i<players.size();i++){
+            Player player = players.get(i);
             if (players.size() != 2){ //avoid adding comma for list of 2
                 strOut += ", ";
             }
             if (i == players.size()-1){
                 strOut += " and ";
             }
-            strOut += players.get(i).getName();
+            strOut += player.getName();
+            if (player instanceof NPC){
+                NPC npc = (NPC) player;
+                strOut += npc.getNPCid();
+            }
         }
         return strOut;
     }
@@ -277,5 +290,14 @@ public class Room extends Entity
 
     public void tellTheWorld(String message){
         theWorld.queueMessage(message);
+    }
+
+    public Merchant getMerchant(){
+        for (Player player : players){
+            if (player instanceof Merchant merchant){
+                return merchant;
+            }
+        }
+        return null;
     }
 }

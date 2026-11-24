@@ -132,11 +132,11 @@ public class Player extends Entity
         entered = newRoom.addPlayer(this); //ensure the new room is properly entered
         logged = roomHistory.add(currentRoom); //add the room being left to the history
         currentRoom = newRoom; //update the fieldsta
-        String debugString = "";
-        debugString += vacated ? "vacated" : "";
-        debugString += entered ? " enetered" : "";
-        debugString += logged ? " logged" : "";
-        System.out.println(debugString);
+        // String debugString = "";
+        // debugString += vacated ? "vacated" : "";
+        // debugString += entered ? " enetered" : "";
+        // debugString += logged ? " logged" : "";
+        // System.out.println(debugString);
         return (vacated && entered && logged); //false if any fail
     }
     
@@ -230,17 +230,19 @@ public class Player extends Entity
             return false;
         } else if (super.acquireItem(item)){ // not too heavy, no bad match with inventory
             // THIS part is regular, successful acquisition!
+            // say(getName()+" picks up "+item.getName()); //gets called for wide variety of things
             return true;
         }  // we know that item is a bad match with something in the inventory. First test to see if we can drop that bad match into room
         Item dropOut = retrieveBadMatch(item); // this item has been dropped out of the player's inventory.
         // before proceeding, we ensure it's safe
         if(dropOut == null || currentRoom.hasBadMatch(dropOut)){ //if there's going to be a problem actually dropping it into the room,
-            super.acquireItem(dropOut); // put the dropOut back in
+            // super.acququitireItem(dropOut); // put the dropOut back in
             return false; //didn't work
         } //now that we know it's safe, drop dropOut into the room
         currentRoom.acquireItem(dropOut);
-        say(getName()+" dropped "+dropOut.getName()+" on accident");
-        say(dropOut.getDescription());
+        say(getName()+" takes "+item.getName());
+        say("\tand drops "+dropOut.getName()+" on accident");
+        // say(dropOut.getDescription());
         // now that we know it's safe, we keep doing so until all bad matches are dropped into room
         while(hasBadMatch(item)){ // for each badly matched item in inventory
             dropOut = retrieveBadMatch(item);
@@ -417,26 +419,38 @@ public class Player extends Entity
         return null;
         }
 
-    public boolean buy(String merchantName, String productName, int amount, String currencyName){
-        Player targetPlayer = currentRoom.getPlayer(merchantName);
-        if (targetPlayer == null || !(targetPlayer instanceof Merchant)){
-            say("there is no merchant "+merchantName);
+    public boolean buy(String productName, String currencyName, int amount){
+        Merchant merchant = currentRoom.getMerchant();
+        if (merchant == null ){
+            say("there is no merchant here");
             return false; // no such player, or not Merchant
         }
-        Merchant merchant = (Merchant) targetPlayer; // safe bc already checked must be a Merchant
+        System.out.println("found merchant");
         if (productName.equals("change")){ //player is just asking for change!
             merchant.requestProduct(productName);
+            return true;
         }
+        System.out.println("not looking for change");
         //having verified the merchant, we now verify the currency item
         Item currency;
         boolean transferred = true;
+        System.out.println("trying to pay "+amount+" "+currencyName);
+        int count = 1;
         for(int i=0; i < amount && transferred; i++){ //while loop checks the last transfer was successful
             currency = retrieveItem(currencyName); //take out the currency
-            if (currency == null) break;
+            System.out.println("retrieved "+currencyName+count);
+            if (currency == null) return false;
             transferred = merchant.acquireCurrency(currency); // add to transaction balance
-            if (!transferred) acquireItem(currency); //pick it back up if transfer failed
+            System.out.println("gave money to merchant");
+            if (!transferred){
+                acquireItem(currency); //pick it back up if transfer failed
+                System.out.println("giving money to merchant actually failed");
+                return false;
+            } 
         }
-        Item product = merchant.requestProduct(productName); // request product. merchant handles product & change 
+        System.out.println("about to request product");
+        Item product = merchant.requestProduct(productName); // request product. merchant handles the rest
+        System.out.println("product request done");
         return acquireItem(product);
     }
 

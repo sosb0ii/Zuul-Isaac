@@ -1,6 +1,5 @@
 public class NPC extends Player
 {
-
     private String monologue;
 
     public NPC(String name, Room fixedRoom){
@@ -24,6 +23,10 @@ public class NPC extends Player
 
     public void setMonologue(String text){
         monologue = text;
+    }
+
+    public String getNPCid(){
+        return "[NPC]";
     }
 
 }

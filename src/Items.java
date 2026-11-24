@@ -41,12 +41,7 @@ public class Items
      * @return true if an item with that name is found in the collection
      */
     public boolean contains(String itemName){
-        for (Item item: contents.keySet()){
-            if (item.getName().equals(itemName)){
-                return true;
-            }
-        }
-        return false;
+        return getCount(itemName) >0;
     }
 
     /**
@@ -178,17 +173,17 @@ public class Items
         return totalWeight;
     }
 
-    /**
-     * Remove all elements with a value of 0
-     */
-    private void dropZeroKeys(){
-        Iterator<Integer> counts = contents.values().iterator();
-        while(counts.hasNext()){
-            if (counts.next() == 0){
-                counts.remove();
-            }
-        }
-    }
+    // /**
+    //  * Remove all elements with a value of 0
+    //  */
+    // private void dropZeroKeys(){
+    //     Iterator<Integer> counts = contents.values().iterator();
+    //     while(counts.hasNext()){
+    //         if (counts.next() == 0){
+    //             counts.remove();
+    //         }
+    //     }
+    // }
 
     /**
      * Whether any items in the collection have the specified attribute

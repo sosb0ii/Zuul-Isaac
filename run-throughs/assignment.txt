@@ -1,0 +1,22 @@
+go dark-hole
+take key
+go the-light
+unlock floor-door key
+go floor-door
+go narrow-oak-doors
+take coin 16
+back
+go doorway
+go front-door
+go pavement
+give Gilmore coin 19
+look
+inventory
+take coin 300
+look
+buy magic-cookie coin 20
+look
+buy change
+inventory
+look
+take coin 1000
