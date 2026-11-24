@@ -1,0 +1,48 @@
+class World
+{
+    private int numPlayers = 1;
+    private Player mainCharacter;
+    public World(WorldName){
+	// init fields
+    }
+
+    public static World fromPreset(String worldName){
+	if 
+	// ALL of the world creation code goes here;
+	// numPlayers - ... ; // nah
+	// ROOMS
+
+	// PLAYERS (inc. NPC's)
+
+	setMainCharacter(p1);
+
+	// ITEMS
+
+	// EXITS
+    }
+
+
+    public int getNumPlayables(){
+	int pCount = 0;
+	for (Player player: players){
+	    if (!(player isinstanceof NPC)){
+		pCount ++;
+	return pCount;
+    }
+
+    public void customizeMainCharacter()
+	for (Player player: players){
+	    if(player isinstanceof NPC){
+		continue;
+	    }
+
+    private void setMainCharacter (Player){
+	mainCharacter = Player;
+    }
+
+    private Player getMainCharacter () {
+	return mainCharacter;
+    }
+
+
+}

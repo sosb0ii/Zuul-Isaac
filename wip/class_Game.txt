@@ -1,0 +1,36 @@
+class Game
+{
+    public static final ArrayList<String> worlds = new ArrayList<>(new List.of(""));
+
+    /**
+     * The main method that sets up and plays the game
+     */
+    public void main(){
+	game = new Game();
+	System.out.println("Welcome to Isaac's Zuul Game!");
+	game.worldMenu();
+	game.playerMenu();
+	game.play();
+    }
+
+    /**
+     * Choose the world to play
+     */
+    public void worldMenu();
+	System.out.println("This game allows you to build and play multiple worlds.\nChoose one from below to play:");
+	System.out.println(World.listWorldNames());
+	String worldName = scanner.nextLine();
+	setWorld(new World.fromPreset(worldName));
+    }
+
+    /**
+     * Choose the player
+     */
+    public void playerMenu(){
+	if (world.getNumPlayables() > 1){
+	    //implement later
+	} else {
+	    setActivePlayer(world.getMainCharacter());   
+	}
+	System.out.println("You are "+activePlayer.getName()+", "+activePlayer.getDescription());
+    }
