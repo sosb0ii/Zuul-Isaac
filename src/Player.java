@@ -425,32 +425,31 @@ public class Player extends Entity
             say("there is no merchant here");
             return false; // no such player, or not Merchant
         }
-        System.out.println("found merchant");
+        // System.out.println("found merchant");
         if (productName.equals("change")){ //player is just asking for change!
             merchant.requestProduct(productName);
             return true;
         }
-        System.out.println("not looking for change");
+        // System.out.println("not looking for change");
         //having verified the merchant, we now verify the currency item
         Item currency;
         boolean transferred = true;
-        System.out.println("trying to pay "+amount+" "+currencyName);
-        int count = 1;
+        // System.out.println("trying to pay "+amount+" "+currencyName);
         for(int i=0; i < amount && transferred; i++){ //while loop checks the last transfer was successful
             currency = retrieveItem(currencyName); //take out the currency
-            System.out.println("retrieved "+currencyName+count);
+            // System.out.println("retrieved "+currencyName+count);
             if (currency == null) return false;
             transferred = merchant.acquireCurrency(currency); // add to transaction balance
-            System.out.println("gave money to merchant");
+            // System.out.println("gave money to merchant");
             if (!transferred){
                 acquireItem(currency); //pick it back up if transfer failed
-                System.out.println("giving money to merchant actually failed");
+                // System.out.println("giving money to merchant actually failed");
                 return false;
             } 
         }
-        System.out.println("about to request product");
+        // System.out.println("about to request product");
         Item product = merchant.requestProduct(productName); // request product. merchant handles the rest
-        System.out.println("product request done");
+        // System.out.println("product request done");
         return acquireItem(product);
     }
 
