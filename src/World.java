@@ -10,13 +10,29 @@ public class World
 {
     private HashMap<String, Room> rooms;
     private HashMap<String, Player> players;
+    private String name;
+    private ArrayList<String> messages;
+    private String introduction;
     
     /**
      * Create an empty world
      */
-    public World(){
+    public World(String name){
         rooms = new HashMap<>();
         players = new HashMap<>();
+        this.name = name;
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setIntroduction(String introduction){
+        this.introduction = introduction;
+    }
+
+    public String getIntroduction(){
+        return (introduction == null) ? "" : introduction;
     }
     
     /**
@@ -58,82 +74,120 @@ public class World
         players.put(player.getName(),player);
         return true;
     }
+
+    /**
+     * Connect two rooms via exits.
+     * They may have different names on 
+     * different sides
+     * @param room1 Room 1
+     * @param name1 The name of the exit from room 1's side
+     * @param room2 Room 2
+     * @param name2 The name of the exit from room 2's side 
+     * @return true if successful
+     */
+    public boolean stitchExits(Room room1, String name1, Room room2, String name2){
+        if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null
+            System.out.println("room DNE");
+            return false;
+        } else if (name1 == null || name2 == null || name1.isEmpty() || name2.isEmpty()){ // invalid exit names
+            System.out.println("bad exit name");
+            return false;
+        } else if (room1.hasExit(name1) || room2.hasExit(name2)){ // exits already exist
+            System.out.println("exit name taken");
+            return false;
+        } // everything good
+        room1.addExit(name1, room2);
+        room2.addExit(name2, room1);
+        return true;
+    }
+
+    /**
+     * Connect two rooms via exits.
+     * They may have different names on 
+     * different sides.
+     * Room 1's side is locked with a key.
+     * 
+     * @param room1 Room 1
+     * @param name1 The name of the exit from room 1's side
+     * @param key the attribute needed to unlock from room 1's side
+     * @param room2 Room 2
+     * @param name2 The name of the exit from room 2's side 
+     * @return true if successful
+     */
+    public boolean stitchExits(Room room1, String name1, String key, Room room2, String name2){
+        if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null
+            System.out.println("room DNE");
+            return false;
+        } else if (name1 == null || name2 == null || name1.isEmpty() || name2.isEmpty()){ // invalid exit names
+            System.out.println("bad exit name");
+            return false;
+        } else if (room1.hasExit(name1) || room2.hasExit(name2)){ // exits already exist
+            System.out.println("exit name taken");
+            return false;
+        } // everything good
+        room1.addExit(name1, room2, key);
+        room2.addExit(name2, room1);
+        return true;
+    }
+
+    /**
+     * Connect two rooms via exits.
+     * They may have different names on 
+     * different sides.
+     * Both sides are locked with a key.
+     * 
+     * @param room1 Room 1
+     * @param name1 The name of the exit from room 1's side
+     * @param room2 Room 2
+     * @param name2 The name of the exit from room 2's side 
+     * @param key the attribute needed to unlock from either side
+     * @return true if successful
+     */
+    public boolean stitchExits(Room room1, String name1, Room room2, String name2, String key){
+        if (!rooms.containsValue(room1) || !rooms.containsValue(room2) || room1 == null || room2 == null){ // rooms not in world, or null
+            System.out.println("room DNE");
+            return false;
+        } else if (name1 == null || name2 == null || name1.isEmpty() || name2.isEmpty()){ // invalid exit names
+            System.out.println("bad exit name");
+            return false;
+        } else if (room1.hasExit(name1) || room2.hasExit(name2)){ // exits already exist
+            System.out.println("exit name taken");
+            return false;
+        } // everything good
+        room1.addExit(name1, room2, key);
+        room2.addExit(name2, room1, key);
+        return true;
+    }
+
+
+    /**
+     * Whether the named player is in the world
+     * @param playerName the name of the player to search
+     * @return true if the player is in the world
+     */
+    public boolean hasPlayer(String playerName){
+        return players.containsKey(playerName);
+    }
     
-    // Replaced with register
-    // /**
-    //  * Add a player to the world, unassigned to any room
-    //  * 
-    //  * Recommended to specify the room.
-    //  * 
-    //  * @param player the player to add to the game
-    //  * @return true if successful
-    //  */
-    // public boolean addPlayer(Player player){
-    //     if (players.containsKey(player.getName())){
-    //         System.out.println("A player named \""+player.getName()+"\" already exists");
-    //         return false;
-    //     }
-    //     players.put(player.getName(),player);
-    //     return true;
-    // }
-    
-    // Not base methods, may be shortcut methods in the future
-    // /**
-    //  * Add a player to a specified room
-    //  * @param player the player to add to the game
-    //  * @param roomName the name of the room the player starts in
-    //  * @return true if successful
-    //  */
-    // public boolean addPlayer(Player player, String roomName){
-    //     if (!rooms.containsKey(roomName)){ //ensure room exists
-    //         System.out.println("World does not contain a room named \""+roomName+"\"");
-    //         return false; //quit if not
-    //     } else if (!addPlayer(player)){ //add player to world and check unique name
-    //         return false; //quit early if failed
-    //     } // both checks pass: room exists and player in world
-    //     return player.spawn(rooms.get(roomName)); // false if failed
-    // }
-    
-    // /**
-    //  * Add a player to a specified room
-    //  * @param player the player to add to the game
-    //  * @param room the room the player starts in
-    //  * @return true if successful
-    //  */
-    // public boolean addPlayer(Player player, Room room){
-    //     if (!addPlayer(player)){ //add player to world and check unique name
-    //         return false; //quit early if failed
-    //     } // both checks pass: room exists and player in world
-    //     return player.spawn(room); // false if failed
-    // }
-    
-    // public static World makeDefault(){
-    //     // rooms in this world
-    //     Room studyRooom = new Room("DEWITT-STUDY","player starts in this room");
-    //     Room skylight = new Room("DEWITT-SKYLIGHT","carpeted space under a skylight");
-    //     Room eastQuad = new Room("QUAD-EAST","open space with paths and flagpole");
-    //     Room Scott = new Room("SCOTT_HALL","middle dorm on the South side");
-    //     Room briansRoom = new Room("BRIAN'S_ROOM","it's the room Brian lives in");
-    //     // players in this world
-    //     Player Brian = new Player("Brian",35);
-    //     Player Kelly = new Player("Kelly",12);
-    //     // items in this world
-    //     Item keyboard = new Item("keyboard","it goes to a computer",0.3);
-    //     Item candy = new Item("candy","just for snax",0.1);
-    //     // create the world object to return
-    //     World thisWorld = new World();
-    //     // put player in room
-    //     thisWorld.addPlayer(Brian, "DEWITT-STUDY");
-    //     thisWorld.addPlayer(Kelly, skylight);
-    //     // link rooms
-        
-        
-        
-        
-        
-    //     return thisWorld;
-    // }
-    
-    // public static boolean 
-    
+    public boolean winReached (Player Player){
+        // if ()
+        return false;
+    }
+
+    public void queueMessage(String message){
+        messages.add(message);
+    }
+
+    public String getMessages(){
+        return String.join("\n",messages);
+    }
+
+    public void clearMessages(){
+        messages.clear();
+    }
+
+    public boolean hasMessages(){
+        return !messages.isEmpty();
+    }
+
 }

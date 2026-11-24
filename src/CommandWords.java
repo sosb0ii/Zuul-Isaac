@@ -13,7 +13,7 @@ public class CommandWords
 {
     // a constant array that holds all valid command words
     private static final String[] validCommands = {
-        "go", "quit", "help", "clear"
+        "help", "go", "quit", "clear", "eat", "look", "inventory", "take", "drop", "give", "switch", "back", "whoami", "unlock"
     };
 
     /**
@@ -28,7 +28,7 @@ public class CommandWords
      * Check whether a given String is a valid command word. 
      * @return true if it is, false if it isn't.
      */
-    public boolean isCommand(String aString)
+    public static boolean isCommand(String aString)
     {
         for(int i = 0; i < validCommands.length; i++) {
             if(validCommands[i].equals(aString))
@@ -47,5 +47,13 @@ public class CommandWords
             System.out.print(command + "  ");
         }
         System.out.println();
+    }
+
+    /**
+     * Print all valid commands to System.out
+     * @return list of valid commands
+     */
+    public String getCommandList(){
+        return String.join(" ", validCommands);
     }
 }

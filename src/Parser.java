@@ -1,4 +1,7 @@
-import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.*;
 
 /**
  * This class is part of the "World of Zuul" application. 
@@ -20,14 +23,42 @@ public class Parser
 {
     private CommandWords commands;  // holds all valid command words
     private Scanner reader;         // source of command input
+    private boolean isFileInput = false; //only true if reading from file
 
     /**
      * Create a parser to read from the terminal window.
      */
     public Parser() 
     {
-        commands = new CommandWords();
+        commands = new CommandWords(); //completely unneccessaryy???
         reader = new Scanner(System.in);
+    }
+
+    /**
+     * Create a parser from a file.
+     */
+    public Parser(String filename) {
+        commands = new CommandWords();
+        try { 
+            reader = new Scanner(new File(filename));
+        } catch (FileNotFoundException e) {
+            System.out.println("Cannot find the file "+filename);
+            System.out.println("Reverting to use the command line for input.");
+            reader = new Scanner(System.in);
+        } catch (IOException e) {
+            System.out.println("Error with File I/O:");
+            e.printStackTrace();
+            System.out.println("Reverting to use the command line for input.");
+            reader = new Scanner(System.in);
+        } 
+        isFileInput=true;
+    }
+    
+    /**
+     * @return true if the input is from a file and false if it is from std.in.
+     */
+    public boolean usingFile() {
+        return isFileInput;
     }
 
     /**
@@ -36,31 +67,13 @@ public class Parser
     public Command getCommand() 
     {
         String inputLine;   // will hold the full input line
-        String word1 = null;
-        String word2 = null;
-
         System.out.print("> ");     // print prompt
 
         inputLine = reader.nextLine();
-
-        // Find up to two words on the line.
-        Scanner tokenizer = new Scanner(inputLine);
-        if(tokenizer.hasNext()) {
-            word1 = tokenizer.next();      // get first word
-            if(tokenizer.hasNext()) {
-                word2 = tokenizer.next();      // get second word
-                // note: we just ignore the rest of the input line.
-            }
+        if (inputLine == null || inputLine.isEmpty()) { //must do this because constructor won't take null
+            return null;
         }
-
-        // Now check whether this word is known. If so, create a command
-        // with it. If not, create a "null" command (for unknown command).
-        if(commands.isCommand(word1)) {
-            return new Command(word1, word2);
-        }
-        else {
-            return new Command(null, word2); 
-        }
+        return new Command(inputLine);
     }
 
     /**

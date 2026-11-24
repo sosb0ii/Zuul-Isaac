@@ -14,14 +14,11 @@ import java.util.*;
  * @version 2016.02.29
  */
 
-public class Room 
+public class Room extends Entity
 {
-    private String name;
-    private String description;
-    private HashMap<String, Room> exits;        // stores exits of this room.
-    private Items items;        // the items in this room.
+    private HashSet<Exit> exits;        // stores exits of this room.
     private ArrayList<Player> players; // uniqueness will be enforced by World
-    private final World theWorld; //must be specified on creation
+    private final World theWorld;
     
     /**
      * Create a room named "name" in `World`.
@@ -30,13 +27,11 @@ public class Room
      * @param world the world this room is in
      */
     public Room(String name, World world){
-        this.name = name;
-        this.description = "";
-        this.exits = new HashMap<>();
-        this.items = new Items();
+        super(name);
+        this.exits = new HashSet<>();
         this.players = new ArrayList<>();
         this.theWorld = world;
-        theWorld.addRoom(this); //add the room to the world
+        world.addRoom(this);
     }
     
     /**
@@ -46,38 +41,21 @@ public class Room
      * @param world the world this room is in
      */
     public Room(String name, String description, World world){
-        this.name = name;
-        this.description = description;
-        this.exits = new HashMap<>();
-        this.items = new Items();
+        super(name,description);
+        this.exits = new HashSet<>();
         this.players = new ArrayList<>();
         this.theWorld = world;
-        theWorld.addRoom(this); //add the room to the world
+        world.addRoom(this);
     }
-    
+
     /**
-     * @return the name of the room
+     * @return the world this entity is in
      */
-    public String getName(){
-        return name;
+    public World getWorld(){
+        return theWorld;
     }
-    
-    /**
-     * @return the description of the room
-     */
-    public String getDescription(){
-        return description;
-    }
-    
-    /**
-     * Whether the room has an item with the specified name
-     * @param itemName: the name of the item
-     * @return true if the room has an item with the specified name
-     */
-    public boolean hasItem(String itemName){
-        return items.contains(itemName);
-    }
-    
+
+          
     /**
      * Whether a room contains the player with the specified name
      * @param playerName the name of the player to search
@@ -101,23 +79,45 @@ public class Room
         return null;
     }
 
-
-
     /**
      * What items are in the room
      * @return a string of items contained in the room, and their information.
      */
-    public String listItems(){
-        return items.list();
+    public String displayItems(){
+        return "Items in "+getName()+":\n"+getItemsList();
     }
     
+    /**
+     * What other players are in the room
+     * @param activePlayer the player to exclude from the list
+     * @return a string of the other players present in the room
+     */
+    public String listOtherPlayers(Player activePlayer){
+        ArrayList<Player> otherPlayers = new ArrayList<>(players);
+        otherPlayers.remove(activePlayer); // no error if activePlayer not present
+        if (otherPlayers.isEmpty()){
+            return "nobody";
+        }
+        String strOut = otherPlayers.get(0).getName();
+        for(int i=1;i<otherPlayers.size();i++){
+            if (otherPlayers.size() != 2){ //avoid adding comma for list of 2
+                strOut += ", ";
+            }
+            if (i == otherPlayers.size()-1){
+                strOut += " and ";
+            }
+            strOut += otherPlayers.get(i).getName();
+        }
+        return strOut;
+    }
+
     /**
      * What players are in the room
      * @return a string of the players present in the room
      */
     public String listPlayers(){
         if (players.isEmpty()){
-            return null;
+            return "nobody";
         }
         String strOut = players.get(0).getName();
         for(int i=1;i<players.size();i++){
@@ -132,87 +132,116 @@ public class Room
         return strOut;
     }
 
+
     /**
      * Whether the room has an exit with the specified name
      * @param exitName: the name of the exit
      * @return true if the room has an exit with the specified name
      */
     public boolean hasExit(String exitName){
-        return exits.containsKey(exitName);
+        for (Exit exit: exits){
+            if(exit.getName().equals(exitName)){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * Define an exit from this room.
+     * Define an (unlocked) exit from this room.
      * @param exitName The name of the exit.
      * @param nextRoom  The room to which the exit leads.
      * @return true if successful
      */
-    public boolean addExit(String exitName, Room nextRoom) 
-    {
-        if (exits.containsKey(exitName)){
+    public boolean addExit(String exitName, Room nextRoom){
+        if (hasExit(exitName)){ // already have exit
             return false; //failed to add exit
-        }        
-        exits.put(exitName, nextRoom);
+        } else if (exitName == null || exitName.isBlank()){
+            return false;
+        }
+        exits.add(new Exit (exitName, nextRoom));
         return true;
     }
 
     /**
-     * Return a string describing the room's exits, for example
-     * "Exits: north west".
-     * @return Details of the room's exits.
+     * Define a (locked) exit from this room.
+     * @param exitName The name of the exit.
+     * @param nextRoom  The room to which the exit leads.
+     * @return true if successful
      */
-    private String getExitString()
-    {
-        String returnString = "Exits:";
-        Set<String> keys = exits.keySet();
-        for(String exit : keys) {
-            returnString += " " + exit;
+    public boolean addExit(String exitName, Room nextRoom, String key) {
+        if (hasExit(exitName)){ // already have exit
+            return false; //failed to add exit
+        } else if (exitName == null || exitName.isBlank()){
+            return false;
         }
-        return returnString;
+        exits.add(new Exit (exitName, nextRoom, key));
+        return true;
+    }
+
+    public Exit getExit(String exitName){
+        for(Exit exit:exits){
+            if(exit.getName().equals(exitName)){
+                return exit;
+            }
+        }
+        return null;
     }
 
     /**
      * Return the room that is reached if we go from this room in direction
      * "direction". If there is no room in that direction, return null.
-     * @param direction The exits direction.
+     * @param direction The exit's direction.
      * @return The room in the specified direction.
      */
-    public Room getExit(String direction) 
+    public Room takeExit(String direction) 
     {
-        return exits.get(direction);
-    }
-       
-    /**
-     * Remove an item from the room, and return it.
-     * 
-     * If there is more than one item with the specified name,
-     * it will just remove/return one of them, and no particular order is guaranteed.
-     * If there is no item with the specified name, return null.
-     * @param itemName the name of the item to retrieve
-     * @return an item with the specified name
-     */
-    public Item retrieveItem(String itemName){
-        return items.retrieve(itemName);    
-    }
-    
-    /**
-     * Add an item to the room
-     * @param item the item to add to the room
-     * @return true if the item was successfully acquired
-     */
-    public boolean acquireItem(Item item){
-        return items.acquire(item);
+        Exit exit = getExit(direction);
+        if (exit == null){
+            return null;
+        }
+        return exit.getRoom(); //null if unlocked
     }
 
     /**
-     * Whether an item can be acquired by the room
-     * @param item the item to check acquisability
-     * @return true if the item can be acquired
+     * Attempt to unlock an exit with a key
+     * @param exitName the name of the exit to unlock
+     * @param key the key to attempt unlocking with
+     * @return whether the exit was unlocked
      */
-    public boolean willAcquireItem(Item item){
-        return items.willAcquire(item);
+    public boolean unlock(String exitName, Item key){
+        Exit exit = getExit(exitName);
+        if (exit == null){
+            return false; // invalid exit name
+        }
+        return exit.unlock(key); //true if successful
     }
-    
+
+    public String listExits(){
+        // return String.join(", ",exits.keySet());
+        if (exits.isEmpty()){
+            return "the 'back' command"; // as in: you can exit via the 'back' command
+        }
+        ArrayList<Exit> exitList = new ArrayList<>(exits);
+        String strOut = exitList.get(0).getName();
+        if (exitList.get(0).isLocked()){
+            strOut += " [locked]";
+        }
+        for(int i=1;i<exitList.size();i++){
+            if (exitList.size() != 2){ //avoid adding comma for list of 2
+                strOut += ", ";
+            }
+            if (i == exitList.size()-1){
+                strOut += " or ";
+            }
+            strOut += exitList.get(i); // takes advantage of toString()
+            if(exitList.get(i).isLocked()){
+                strOut += "[locked]";
+            }
+        }
+        return strOut;
+    }
+          
     /**
      * Remove a player from the room.
      * 
@@ -246,44 +275,7 @@ public class Room
         return (registered && spawned);
     }
 
-    /**
-     * Get the weight of a specified item
-     * 
-     */
-    public double getItemWeight(String itemName){
-        return items.getItemWeight(itemName);
+    public void tellTheWorld(String message){
+        theWorld.queueMessage(message);
     }
-
-    /**
-     * How many items are in the room
-     * @return the number of items in the room
-     */
-    public int getNumItems(){
-        return items.size();
-    }
-
-    public boolean hasMatchingItem(Item item){
-        return items.containsMatching(item);
-    }
-
-    /**
-     * To avoid rooms having the same name, we add a number to repeat names
-     * 
-     * E.g., adding a "bathroom" twice would make the second one "bathroom(1)"
-     */
-    public void rename(){
-        String nameStr;
-        int count;
-        if(name.endsWith(")")){ // we've done this before
-            nameStr = name.substring(0,name.lastIndexOf("("));
-            count = Integer.parseInt(name.substring(name.lastIndexOf("(")+1,name.lastIndexOf(")")));
-        } else { //first time renaming
-            nameStr = name;
-            count = 0;
-        }
-        name = nameStr+"("+(count+1)+")";
 }
-
-
-}
-
