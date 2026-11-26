@@ -6,6 +6,9 @@ import java.util.*;
  * @Isaac Evans
  * @November 15
  */
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 public class World
 {
     // Static field
@@ -313,6 +316,20 @@ public class World
 
     public boolean hasMessages(){
         return !messages.isEmpty();
+    }
+
+    public JSONObject toJSON(){
+        JSONObject jsonOut = new JSONObject()
+            .put("name",name)
+            .put("introduction",introduction)
+            .put("numPlayers",numPlayers)
+            .put("mainCharacter",mainCharacter.getName());
+        // skip players, instead generate them from Rooms
+        JSONArray roomsJSON = new JSONArray();
+        for(Room room:rooms.values()){
+            roomsJSON.put(room.toJSON());
+        }
+        return jsonOut;
     }
 
 }

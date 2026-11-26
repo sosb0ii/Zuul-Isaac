@@ -5,6 +5,8 @@ import java.util.*;
  * @Isaac
  * @November 6 2026
  */
+
+import org.json.JSONObject;
 public class Player extends Entity
 {
     private Room currentRoom;
@@ -459,5 +461,16 @@ public class Player extends Entity
 
     public void sayI(String message){
         currentRoom.tellTheWorld(getName()+": "+message);
+    }
+
+    @Override 
+    public JSONObject toJSON(){
+        JSONObject jsonOut = super.toJSON();
+        // excluded currentRoom because json will infer that from structure
+        // jsonOut.put("currentRoom",currentRoom.getName());
+        // excluded roomHistory; not a vital mechanic, it will just be cached in one session
+        jsonOut.put("capacity",capacity);
+        jsonOut.put("likeness",likeness);
+        return jsonOut;
     }
 }

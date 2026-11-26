@@ -1,4 +1,5 @@
 import java.util.*;
+import org.json.JSONArray;
 /**
  * A wrapper class that represents a collection of Item objects.
  * The Items contained herein are individual and identifiable,
@@ -330,6 +331,10 @@ public class Items
             netWorth += itemCount.getKey().getWorth() * itemCount.getValue(); //item.worth*count
         }
         return netWorth;
+    }
+
+    public JSONArray toJSON(){
+        return new JSONArray(contents);
     }
 
 }

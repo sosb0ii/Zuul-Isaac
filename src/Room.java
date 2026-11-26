@@ -1,5 +1,8 @@
 import java.util.*;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * Class Room - a room in an adventure game.
  *
@@ -299,5 +302,22 @@ public class Room extends Entity
             }
         }
         return null;
+    }
+
+    @Override 
+    public JSONObject toJSON(){
+        JSONObject jsonOut = super.toJSON();
+        JSONArray exitsJSON = new JSONArray();
+        for(Exit exit:this.exits){
+            exitsJSON.put(exit.toJSON());
+        }
+        jsonOut.put("exits",exitsJSON);
+        JSONArray playersJSON = new JSONArray();
+        for(Player player:players){
+            playersJSON.put(player.toJSON());
+        }
+        jsonOut.put("players",playersJSON);
+        // excluded theWorld, that will be inferred from structure
+        return jsonOut;
     }
 }

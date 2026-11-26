@@ -1,3 +1,6 @@
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+
+import org.json.JSONObject;
 // import java.util.*;
 
 /**
@@ -194,4 +197,11 @@ public abstract class Entity
         return getName();
     }
 
+    public JSONObject toJSON(){
+        JSONObject jsonOut = new JSONObject()
+            .put("name",name)
+            .put("description",description)
+            .put("items",items.toJSON());
+        return jsonOut;
+    }
 }

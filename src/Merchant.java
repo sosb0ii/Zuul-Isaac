@@ -1,3 +1,5 @@
+import org.json.JSONObject;
+
 /**
  * 
  * Merchant is an NPC that sells you stuff.
@@ -127,6 +129,15 @@ public class Merchant extends NPC
     @Override 
     public String getNPCid(){
         return "[NPC-merchant]";
+    }
+
+    @Override 
+    public JSONObject toJSON(){
+        JSONObject jsonOut = super.toJSON();
+        jsonOut.put("validCurrencies",validCurrencies.toJSON());
+        jsonOut.put("forSale",forSale.toJSON());
+        jsonOut.put("transaction",transaction.toJSON());
+        return jsonOut;
     }
 
 

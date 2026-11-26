@@ -1,3 +1,5 @@
+import org.json.JSONObject;
+
 /**
  * Exit
  * 
@@ -72,4 +74,13 @@ public class Exit {
         return locked;
     }
 
+    public JSONObject toJSON(){
+        JSONObject jsonOut = new JSONObject();
+        jsonOut.put("name",exitName);
+        // Constructor from the JSON must know World in order to retrieve Rooms via their names
+        jsonOut.put("destination", destination.getName());
+        jsonOut.put("locked",locked);
+        jsonOut.put("key",key);
+        return jsonOut;
+    }
 }

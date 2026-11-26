@@ -1,4 +1,8 @@
 import java.util.*;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 /**
  * A simple class of the items in the game.
  * An item can only be in one place at a certain time,
@@ -230,4 +234,14 @@ public class Item
         addAttribute("costs "+String.valueOf(cost)+" gold");
     }
     
+    public JSONObject toJSON(){
+        JSONObject jsonOut = new JSONObject()
+            .put("name",name)
+            .put("description",description)
+            .put("weight",weight);
+        JSONArray jsonAttrs = new JSONArray(attributes);
+        jsonOut.put("attributes",jsonAttrs);
+        return jsonOut;
+    }
+
 }

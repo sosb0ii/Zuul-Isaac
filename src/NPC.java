@@ -1,3 +1,5 @@
+import org.json.JSONObject;
+
 public class NPC extends Player
 {
     private String monologue;
@@ -27,6 +29,13 @@ public class NPC extends Player
 
     public String getNPCid(){
         return "[NPC]";
+    }
+
+    @Override
+    public JSONObject toJSON(){
+        JSONObject jsonOut = super.toJSON();
+        jsonOut.put("monologue",monologue);
+        return jsonOut;
     }
 
 }
